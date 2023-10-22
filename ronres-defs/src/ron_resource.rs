@@ -2,9 +2,11 @@ use godot::{prelude::{GodotClass, GodotString, Variant, Gd, godot_print, ToGodot
 use ron::{ser, de};
 use serde::{Serialize, Deserialize};
 
-pub trait RonSave
+pub trait RonResource
 where 
 Self: Serialize + for<'de> Deserialize<'de> + GodotClass<Declarer = UserDomain> {
+
+  const PATH_ENDS_WITH: &'static str;
 
   fn save_ron(&self, path: GodotString) -> Error {
     if let Some(access) = &mut FileAccess::open(path.clone(), ModeFlags::WRITE) {

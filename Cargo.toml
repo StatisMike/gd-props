@@ -2,5 +2,6 @@
 resolver = "2"
 members = [
   "ronres",
-  "ronres-derive"
+  "ronres-derive",
+  "ronres-defs"
 ]

@@ -1,5 +1,5 @@
 [package]
-name = "ronres"
+name = "ronres-defs"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,8 +7,6 @@ edition = "2021"
 
 [dependencies]
 ron = "0.8.1"
-ronres-derive = { path = "../ronres-derive" }
-ronres-defs = { path = "../ronres-defs" }
 serde = { version = "1.0.189", features = ["derive"] }
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 once_cell = "1.18.0"

@@ -213,7 +213,18 @@ dependencies = [
  "godot",
  "once_cell",
  "ron",
+ "ronres-defs",
  "ronres-derive",
+ "serde",
+]
+
+[[package]]
+name = "ronres-defs"
+version = "0.1.0"
+dependencies = [
+ "godot",
+ "once_cell",
+ "ron",
  "serde",
 ]
 
@@ -226,7 +237,7 @@ dependencies = [
  "quote",
  "ron",
  "serde",
- "syn 1.0.109",
+ "venial",
 ]
 
 [[package]]
@@ -246,18 +257,7 @@ checksum = "1e48d1f918009ce3145511378cf68d613e3b3d9137d67272562080d68a2b32d5"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.38",
-]
-
-[[package]]
-name = "syn"
-version = "1.0.109"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237"
-dependencies = [
- "proc-macro2",
- "quote",
- "unicode-ident",
+ "syn",
 ]
 
 [[package]]
