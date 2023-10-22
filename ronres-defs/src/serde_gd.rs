@@ -2,9 +2,9 @@
 //! methods for Godot objects.
 
 /// Module that can be used to serialize and deserialize
-/// `Gd<T>`, where `T` is rust-declared Godot Resource.
+/// [godot::obj::Gd] for objects castable to [godot::engine::Resource].
 /// 
-/// Its main use is to derive `Serialize` and `Deserialize` on
+/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on
 /// resources containing pointers to other resources, while
 /// keeping data from every one.
 /// 
@@ -60,9 +60,9 @@ pub mod gd {
 }
 
 /// Module that can be used to serialize and deserialize
-/// `Option<Gd<T>>`, where `T` is rust-declared Godot Resource.
+/// [Option<godot::obj::Gd>] for objects castable to [godot::engine::Resource].
 /// 
-/// Its main use is to derive `Serialize` and `Deserialize` on
+/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on
 /// resources containing optional pointers to other resources, while
 /// keeping data from every one (if attached)
 /// 

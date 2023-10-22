@@ -212,7 +212,6 @@ version = "0.1.0"
 dependencies = [
  "godot",
  "once_cell",
- "ron",
  "ronres-defs",
  "ronres-derive",
  "serde",

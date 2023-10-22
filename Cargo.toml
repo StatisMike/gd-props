@@ -1,7 +1,5 @@
 [workspace]
 resolver = "2"
 members = [
-  "ronres",
-  "ronres-derive",
-  "ronres-defs"
+  "ronres"
 ]

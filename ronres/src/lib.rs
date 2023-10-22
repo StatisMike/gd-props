@@ -74,37 +74,6 @@ mod res {
     }
 
     #[test]
-    fn macro_can_be_implemented() {
-
-        // #[derive(GodotClass, Serialize, Deserialize, RonResource)]
-        // #[class(init, base=Resource)]
-        // #[path_ends_with="hehe.ron"]
-        // struct TestStruct {}
-
-        // #[godot_api]
-        // impl TestStruct {}
-
-        // #[derive(GodotClass, Serialize, Deserialize, RonResource)]
-        // #[class(init, base=Resource)]
-        // struct TestStruct2 {}
-
-        // #[godot_api]
-        // impl TestStruct2 {}
-
-        // create_ron_saver_and_loader!(
-        //     TestSaver,
-        //     TestLoader,
-        //     UID_MAP,
-        //     TestStruct -> "test.ron"
-        //     TestStruct2 -> "test2.ron"
-        // );
-
-        // TestSaver::register();
-        // TestLoader::register();
-
-    }
-
-    #[test]
     fn uid_map_can_be_created() {
         #[ronres_uid_map]
         static HELLO_WORLD: UidMap;
@@ -138,6 +107,8 @@ mod res {
         #[register(TestStruct2)]
         pub struct MyRonLoader {}
 
+        assert_eq!(MyRonLoader::SINGLETON_NAME, "MyRonLoader");
+
     }
 
     #[test]
@@ -169,7 +140,7 @@ mod res {
         #[register(TestStruct2)]
         pub struct MyRonSaver {}
 
-        
+        assert_eq!(MyRonSaver::SINGLETON_NAME, "MyRonSaver");
 
     }
 }
