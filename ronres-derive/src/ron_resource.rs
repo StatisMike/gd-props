@@ -25,7 +25,7 @@ pub fn derive_ron_resource(decl: Declaration) -> Result<TokenStream, venial::Err
   }
 
   Ok(quote!(
-    impl ::ronres_defs::traits::RonResource for #name {
+    impl ::ronres::traits::RonResource for #name {
       const PATH_ENDS_WITH: &'static str = #path_name;
     }
   ))

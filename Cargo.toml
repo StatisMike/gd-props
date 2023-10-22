@@ -3,5 +3,7 @@ resolver = "2"
 members = [
   "ronres",
   "ronres-defs",
-  "ronres-derive"
+  "ronres-derive",
+
+  "tests"
 ]
