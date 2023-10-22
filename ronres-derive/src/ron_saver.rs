@@ -52,19 +52,19 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
       /// Name under which the object registers in Godot as a singleton
       pub const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
 
-      fn create_instance()-> godot::obj::Gd<godot::engine::ResourceFormatSaver> {
+      fn create_instance()-> godot::obj::Gd<Self> {
         godot::obj::Gd::<Self>::new_default().upcast()
       } 
 
       /// Associated function to retrieve the pointer to object singleton
       /// as `Gd<ResourceFormatSaver>`.
-      pub fn saver_singleton() -> godot::obj::Gd<godot::engine::ResourceFormatSaver> {
+      pub fn saver_singleton() -> godot::obj::Gd<Self> {
         if godot::engine::Engine::singleton()
           .has_singleton(Self::SINGLETON_NAME.into()) {
 
           godot::engine::Engine::singleton()
           .get_singleton(Self::SINGLETON_NAME.into()).unwrap()
-          .cast::<godot::engine::ResourceFormatSaver>()
+          .cast::<Self>()
   
         } else {
   
@@ -97,7 +97,7 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
       pub fn register_saver() {
         let instance = Self::saver_singleton();
         let saver = &mut godot::engine::ResourceSaver::singleton();
-        saver.add_resource_format_saver(instance);
+        saver.add_resource_format_saver(instance.upcast());
       }
     }
   ))

@@ -76,6 +76,7 @@ mod tests {
     fn ron_loader_can_be_implemented() {
     
         #[derive(GodotClass, Serialize, Deserialize, RonResource)]
+        #[path_ends_with="test1.ron"]
         #[class(init, base=Resource)]
         struct TestStruct {}
     
@@ -108,6 +109,7 @@ mod tests {
     fn ron_saver_can_be_implemented() {
     
         #[derive(GodotClass, Serialize, Deserialize, RonResource)]
+        #[path_ends_with="test1.ron"]
         #[class(init, base=Resource)]
         struct TestStruct {}
     

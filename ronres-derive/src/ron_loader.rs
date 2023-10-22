@@ -63,19 +63,19 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       /// Name under which the object registers in Godot as a singleton
       pub const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
 
-      fn create_instance()-> godot::obj::Gd<godot::engine::ResourceFormatLoader> {
+      fn create_instance()-> godot::obj::Gd<Self> {
         godot::obj::Gd::<Self>::new_default().upcast()
       } 
 
       /// Associated function to retrieve the pointer to object singleton
       /// as `Gd<ResourceFormatLoader>`.
-      pub fn loader_singleton() -> godot::obj::Gd<godot::engine::ResourceFormatLoader> {
+      pub fn loader_singleton() -> godot::obj::Gd<Self> {
         if godot::engine::Engine::singleton()
           .has_singleton(Self::SINGLETON_NAME.into()) {
 
           godot::engine::Engine::singleton()
           .get_singleton(Self::SINGLETON_NAME.into()).unwrap()
-          .cast::<godot::engine::ResourceFormatLoader>()
+          .cast::<Self>()
   
         } else {
   
@@ -108,7 +108,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       pub fn register_loader() {
         let instance = Self::loader_singleton();
         let loader = &mut godot::engine::ResourceLoader::singleton();
-        loader.add_resource_format_loader(instance);
+        loader.add_resource_format_loader(instance.upcast());
       }
     }
   ))
