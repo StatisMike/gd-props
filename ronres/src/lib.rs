@@ -8,6 +8,7 @@ pub mod macros {
 pub mod traits {
     pub use ronres_defs::traits::GdRonResource;
     pub use ronres_defs::traits::GdRonLoader;
+    pub use ronres_defs::traits::GdRonSaver;
 }
 
 pub use ronres_defs::types::UidMap;
