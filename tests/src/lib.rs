@@ -8,15 +8,14 @@ mod tests {
     #[test]
     fn trait_can_be_implemented() {
     
-        #[derive(GodotClass, Serialize, Deserialize, RonResource)]
+        #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
         #[class(init, base=Resource)]
-        #[path_ends_with="hehe.ron"]
         struct TestStruct {}
     
         #[godot_api]
         impl TestStruct {}
     
-        assert_eq!(TestStruct::PATH_ENDS_WITH, "hehe.ron");
+        assert_eq!(TestStruct::RON_FILE_HEAD_IDENT, "TestStruct");
     
     }
     
@@ -75,17 +74,15 @@ mod tests {
     #[test]
     fn ron_loader_can_be_implemented() {
     
-        #[derive(GodotClass, Serialize, Deserialize, RonResource)]
-        #[path_ends_with="test1.ron"]
+        #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
         #[class(init, base=Resource)]
         struct TestStruct {}
     
         #[godot_api]
         impl TestStruct {}
     
-        #[derive(GodotClass, Serialize, Deserialize, RonResource)]
+        #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
         #[class(init, base=Resource)]
-        #[path_ends_with="test2.ron"]
         struct TestStruct2 {}
     
         #[godot_api]
@@ -94,7 +91,7 @@ mod tests {
         #[ronres_uid_map]
         static HELLO_WORLD: UidMap;
     
-        #[derive(GodotClass, RonLoader)]
+        #[derive(GodotClass, GdRonLoader)]
         #[uid_map(HELLO_WORLD)]
         #[class(init, tool, base=ResourceFormatLoader)]
         #[register(TestStruct)]
@@ -108,17 +105,15 @@ mod tests {
     #[test]
     fn ron_saver_can_be_implemented() {
     
-        #[derive(GodotClass, Serialize, Deserialize, RonResource)]
-        #[path_ends_with="test1.ron"]
+        #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
         #[class(init, base=Resource)]
         struct TestStruct {}
     
         #[godot_api]
         impl TestStruct {}
     
-        #[derive(GodotClass, Serialize, Deserialize, RonResource)]
+        #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
         #[class(init, base=Resource)]
-        #[path_ends_with="test2.ron"]
         struct TestStruct2 {}
     
         #[godot_api]
@@ -128,7 +123,7 @@ mod tests {
         static HELLO_WORLD: UidMap;
     
         #[derive(GodotClass)]
-        #[derive(RonSaver)]
+        #[derive(GdRonSaver)]
         #[uid_map(HELLO_WORLD)]
         #[class(init, tool, base=ResourceFormatSaver)]
         #[register(TestStruct)]

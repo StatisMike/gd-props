@@ -17,7 +17,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
     #[godot::prelude::godot_api]
     impl godot::engine::ResourceFormatLoaderVirtual for #struct_ident {
       fn get_recognized_extensions(&self) -> godot::builtin::PackedStringArray {
-        godot::builtin::PackedStringArray::from(&[godot::builtin::GodotString::from("ron")])
+        godot::builtin::PackedStringArray::from(&[godot::builtin::GodotString::from("gdron")])
       }
 
       fn handles_type(&self, type_: godot::builtin::StringName) -> bool {
@@ -31,12 +31,18 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
 
       fn get_resource_type(&self, path: godot::builtin::GodotString) -> godot::builtin::GodotString {
-        let stringified = path.to_string().to_lowercase();
-        #(
-          if stringified.ends_with(#registers::PATH_ENDS_WITH) {
-            return godot::builtin::GodotString::from(stringify!(#registers));
+        let res = Self::read_ident_from_ron_file(path);
+        match res {
+          Err(error) => godot::prelude::godot_print!("Error getting resource type: {}", error),
+          Ok(struct_name) => {
+            #(
+              if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
+                return godot::builtin::GodotString::from(stringify!(#registers));
+              }
+            )*
           }
-        )*
+        };
+        
         godot::builtin::GodotString::new()
       }
 
@@ -59,57 +65,8 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
     }
 
-    impl #struct_ident {
-      /// Name under which the object registers in Godot as a singleton
-      pub const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
-
-      fn create_instance()-> godot::obj::Gd<Self> {
-        godot::obj::Gd::<Self>::new_default().upcast()
-      } 
-
-      /// Associated function to retrieve the pointer to object singleton
-      /// as `Gd<ResourceFormatLoader>`.
-      pub fn loader_singleton() -> godot::obj::Gd<Self> {
-        if godot::engine::Engine::singleton()
-          .has_singleton(Self::SINGLETON_NAME.into()) {
-
-          godot::engine::Engine::singleton()
-          .get_singleton(Self::SINGLETON_NAME.into()).unwrap()
-          .cast::<Self>()
-  
-        } else {
-  
-          let object = Self::create_instance();
-          godot::engine::Engine::singleton()
-          .register_singleton(Self::SINGLETON_NAME.into(),object.clone().upcast());
-          object
-        }
-      }
-
-      /// Associated function to register the created `ResourceFormatLoader`
-      /// in Godot's `ResourceLoader`. To be used in `lib.rs` declaration of
-      /// `ExtensionLibrary` implementation.
-      /// 
-      /// ## Example
-      /// 
-      /// ```no_run
-      /// //lib.rs
-      /// 
-      /// struct MyGdExtension;
-      ///
-      /// unsafe impl ExtensionLibrary for MyGdExtension {
-      ///     fn on_level_init(_level: InitLevel) {
-      ///         if _level = InitLevel::Scene {
-      ///             MyRonLoaderStruct::register_loader();
-      /// 
-      ///     }   
-      /// }
-      /// ```
-      pub fn register_loader() {
-        let instance = Self::loader_singleton();
-        let loader = &mut godot::engine::ResourceLoader::singleton();
-        loader.add_resource_format_loader(instance.upcast());
-      }
+    impl ronres::traits::GdRonLoader for #struct_ident {
+      const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
     }
   ))
 }

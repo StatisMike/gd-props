@@ -2,7 +2,7 @@ use proc_macro2::{TokenTree, Ident};
 use venial::{AttributeValue, Declaration};
 
 #[derive(Debug)]
-pub struct RonSaverLoaderAttributes {
+pub(crate) struct RonSaverLoaderAttributes {
     pub registers: Vec<proc_macro2::Ident>,
     pub uid_map: Ident,
 }

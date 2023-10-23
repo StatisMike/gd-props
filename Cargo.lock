@@ -235,6 +235,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "ron",
+ "ronres-defs",
  "serde",
  "venial",
 ]
