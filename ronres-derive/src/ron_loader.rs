@@ -31,28 +31,27 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
 
       fn get_resource_type(&self, path: godot::builtin::GodotString) -> godot::builtin::GodotString {
-        let res = Self::read_ident_from_ron_file(path);
-        match res {
-          Err(error) => godot::prelude::godot_print!("Error getting resource type: {}", error),
-          Ok(struct_name) => {
-            #(
-              if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
-                return godot::builtin::GodotString::from(stringify!(#registers));
-              }
-            )*
-          }
-        };
-        
+        if let Ok(struct_name) = Self::read_ident_from_ron_file(path) {
+          #(
+            if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
+              return godot::builtin::GodotString::from(stringify!(#registers));
+            }
+          )*
+        }       
         godot::builtin::GodotString::new()
       }
 
       fn load(&self, path: godot::builtin::GodotString, _original_path: godot::builtin::GodotString, _use_sub_threads: bool, _cache_mode: i32) -> godot::builtin::Variant {
-        let type_ = self.get_resource_type(path.clone());
-        #(
-          if type_.eq(&godot::builtin::GodotString::from(stringify!(#registers))) {
-            return #registers::load_ron(path);
+        match Self::read_ident_from_ron_file(path.clone()) {
+          Err(error) => godot::prelude::godot_error!("Error getting '{}' resource type during load: {}", path, error),
+          Ok(struct_name) => {
+            #(
+              if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
+                return #registers::load_ron(path);
+              }
+            )*
           }
-        )*
+        }
         godot::builtin::Variant::nil()
       }
 

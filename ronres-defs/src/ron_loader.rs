@@ -15,7 +15,6 @@ where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFor
     let start = line.find(GD_RON_START).ok_or(GdRonError::HeaderRead)?;
     let end = line.find(GD_RON_END).ok_or(GdRonError::HeaderRead)?;
     let struct_name = line[start+GD_RON_START.len()..start+end].to_string();
-    println!("Found struct name: {}", struct_name);
     Ok(struct_name)
   }
 
