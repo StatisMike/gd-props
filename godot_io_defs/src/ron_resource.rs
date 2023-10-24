@@ -5,14 +5,14 @@ use serde::{Serialize, Deserialize};
 use crate::{GD_RON_START, GD_RON_END};
 
 /// Trait which provides methods to serialize and deserialize
-/// rust-defined [godot::engine::Resource] to `gdron` format
-/// expanded from [ron] format 
+/// rust-defined [Resource](godot::engine::Resource) to `gdron` files, 
+/// based on [ron]
 pub trait GdRonResource
 where 
 Self: Serialize + for<'de> Deserialize<'de> + GodotClass<Declarer = UserDomain> {
 
 
-  /// Ron file header identifier for struct recognition
+  /// Struct identifier included in `gdron` file
   const RON_FILE_HEAD_IDENT: &'static str;
 
   /// Save object to a file located at `path` in [ron] format

@@ -11,7 +11,7 @@ pub fn derive_ron_resource(decl: Declaration) -> Result<TokenStream, venial::Err
   let name = &item.name;
 
   Ok(quote!(
-    impl ::ronres::traits::GdRonResource for #name {
+    impl ::godot_io::traits::GdRonResource for #name {
       const RON_FILE_HEAD_IDENT: &'static str = stringify!(#name);
     }
   ))

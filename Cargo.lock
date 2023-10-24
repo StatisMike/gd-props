@@ -109,6 +109,40 @@ version = "0.0.0"
 source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.1.1#fca6897dbfb1a2d9387f81491acd77f6f091b8c4"
 
 [[package]]
+name = "godot_io"
+version = "0.1.0"
+dependencies = [
+ "godot",
+ "godot_io_defs",
+ "godot_io_derive",
+ "once_cell",
+ "serde",
+]
+
+[[package]]
+name = "godot_io_defs"
+version = "0.1.0"
+dependencies = [
+ "godot",
+ "once_cell",
+ "ron",
+ "serde",
+]
+
+[[package]]
+name = "godot_io_derive"
+version = "0.1.0"
+dependencies = [
+ "godot",
+ "godot_io_defs",
+ "proc-macro2",
+ "quote",
+ "ron",
+ "serde",
+ "venial",
+]
+
+[[package]]
 name = "heck"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -207,40 +241,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ronres"
-version = "0.1.0"
-dependencies = [
- "godot",
- "once_cell",
- "ronres-defs",
- "ronres-derive",
- "serde",
-]
-
-[[package]]
-name = "ronres-defs"
-version = "0.1.0"
-dependencies = [
- "godot",
- "once_cell",
- "ron",
- "serde",
-]
-
-[[package]]
-name = "ronres-derive"
-version = "0.1.0"
-dependencies = [
- "godot",
- "proc-macro2",
- "quote",
- "ron",
- "ronres-defs",
- "serde",
- "venial",
-]
-
-[[package]]
 name = "serde"
 version = "1.0.189"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -276,8 +276,8 @@ name = "tests"
 version = "0.1.0"
 dependencies = [
  "godot",
+ "godot_io",
  "once_cell",
- "ronres",
  "serde",
 ]
 

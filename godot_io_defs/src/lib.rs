@@ -5,8 +5,8 @@ mod ron_loader;
 mod ron_saver;
 pub mod errors;
 
-pub(crate) const GD_RON_START: & str = "gdRon[";
-pub(crate) const GD_RON_END: & str = "]*";
+pub(crate) const GD_RON_START: & str = "gd=[";
+pub(crate) const GD_RON_END: & str = "]=";
 
 pub mod traits {
   pub use super::ron_resource::GdRonResource;

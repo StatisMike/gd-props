@@ -1,5 +1,5 @@
 [package]
-name = "ronres-defs"
+name = "godot_io_defs"
 version = "0.1.0"
 edition = "2021"
 

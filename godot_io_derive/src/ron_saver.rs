@@ -48,7 +48,7 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
       }
     }
 
-    impl ronres::traits::GdRonSaver for #struct_ident {
+    impl godot_io::traits::GdRonSaver for #struct_ident {
       const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
     }
   ))

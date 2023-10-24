@@ -1,4 +1,14 @@
-use godot::{prelude::{GodotClass, Inherits, Object, GodotString, Gd}, obj::{dom::UserDomain, cap::GodotInit}, engine::{ResourceFormatLoader, FileAccess, file_access::ModeFlags, Engine}};
+use godot::{
+  prelude::{
+    GodotClass, Inherits, Object, GodotString, Gd
+  }, 
+  obj::{
+    dom::UserDomain, cap::GodotInit
+  }, 
+  engine::{
+    ResourceFormatLoader, FileAccess, file_access::ModeFlags, Engine
+  }
+};
 
 use crate::{errors::GdRonError, GD_RON_START, GD_RON_END};
 
@@ -37,9 +47,9 @@ where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFor
     }
   }
 
-  /// Associated function to register the created [godot::engine::ResourceFormatLoader]
-  /// in Godot's [godot::engine::ResourceLoader]. To be used in
-  /// [godot::prelude::ExtensionLibrary] implementation.
+  /// Associated function to register the created [ResourceFormatLoader]
+  /// in Godot's [ResourceLoader](godot::engine::ResourceLoader). To be used in
+  /// [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation.
   /// 
   /// ## Example
   /// ```no_run

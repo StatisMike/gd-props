@@ -64,7 +64,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
     }
 
-    impl ronres::traits::GdRonLoader for #struct_ident {
+    impl godot_io::traits::GdRonLoader for #struct_ident {
       const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
     }
   ))

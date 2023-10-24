@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use ronres::{*, macros::*, traits::*};
+    use godot_io::{*, macros::*, traits::*};
     use godot::prelude::{GodotClass, godot_api, Gd, ResourceVirtual, Resource, Base};
     use serde::{Serialize, Deserialize};
     use godot::engine::{ResourceFormatLoaderVirtual, ResourceFormatSaverVirtual};
@@ -67,7 +67,7 @@ mod tests {
     
     #[test]
     fn uid_map_can_be_created() {
-        #[ronres_uid_map]
+        #[godot_io_uid_map]
         static HELLO_WORLD: UidMap;
     }
     
@@ -88,7 +88,7 @@ mod tests {
         #[godot_api]
         impl TestStruct2 {}
     
-        #[ronres_uid_map]
+        #[godot_io_uid_map]
         static HELLO_WORLD: UidMap;
     
         #[derive(GodotClass, GdRonLoader)]
@@ -119,7 +119,7 @@ mod tests {
         #[godot_api]
         impl TestStruct2 {}
     
-        #[ronres_uid_map]
+        #[godot_io_uid_map]
         static HELLO_WORLD: UidMap;
     
         #[derive(GodotClass)]

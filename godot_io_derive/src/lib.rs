@@ -9,8 +9,8 @@ pub(crate) mod ron_loader;
 pub(crate) mod utils;
 pub(crate) mod uid_map;
 
-/// Macro used to implement [ronres_defs::traits::GdRonResource] trait, which makes 
-/// a rust-defined godot [godot::engine::Resource] serializable
+/// Macro used to implement [GdRonResource](godot_io_defs::traits::GdRonResource) trait, which makes 
+/// a rust-defined godot [Resource](godot::engine::Resource) serializable
 /// and deserializable to `.gdron` format, providing
 /// compatibility with [GdRonSaver] and [GdRonLoader] deriving
 /// structs.
@@ -28,19 +28,19 @@ pub fn derive_ron_resource(input: TokenStream) -> TokenStream {
 
 }
 
-/// Macro used to implement [ronres_defs::traits::GdRonSaver] trait for
-/// a bare rust-defined [godot::engine::ResourceFormatSaver], allowing
+/// Macro used to implement [GdRonSaver](godot_io_defs::traits::GdRonSaver) trait for
+/// a bare rust-defined [ResourceFormatSaver](godot::engine::ResourceFormatSaver), allowing
 /// registered resources deriving [GdRonResource] to be saved with it
 /// into `.gdron` file.
 /// 
 /// Alongside implementing above trait, macro also implements
-/// [godot::engine::ResourceFormatSaverVirtual], so you shouldn't
+/// [ResourceFormatSaverVirtual](godot::engine::ResourceFormatSaverVirtual), so you shouldn't
 /// implement it yourself.
 /// 
 /// ## Macro attributes
-/// - `#[uid_map(MY_UID_MAP)]` - requires providing [ronres_defs::types::UidMap]
+/// - `#[uid_map(MY_UID_MAP)]` - requires providing [UidMap](godot_io_defs::types::UidMap)
 /// `static`, which holds the unique identifiers of saved and loaded
-/// resources. Can be created easily with [macro@ronres_uid_map] macro.
+/// resources. Can be created easily with [macro@godot_io_uid_map] macro.
 /// The same object should be provided for [GdRonLoader] handling the
 /// same resources
 /// - `#[register(MyGdRonResource, MySecondResource)]` - registers Resources
@@ -57,7 +57,7 @@ pub fn derive_ron_resource(input: TokenStream) -> TokenStream {
 /// #[godot_api]
 /// impl TestStruct {}
 ///
-/// #[ronres_uid_map]
+/// #[godot_io_uid_map]
 /// static HELLO_WORLD: UidMap;
 ///
 /// #[derive(GodotClass, GdRonSaver)]
@@ -71,12 +71,14 @@ pub fn derive_ron_resource(input: TokenStream) -> TokenStream {
 /// 
 /// To make the Saver recognizable by editor, remember to all `tool`
 /// value to the `GodotClass` macro `#[class]` attribute.
-/// Additionally, you need to register the saver in the [godot::engine::ResourceSaver]
-/// singleton at Godot runtime initialization. Recommended way calling
-/// `GdResourceSaver::register_saver()` associated function in [godot::prelude::ExtensionLibrary]
+/// Additionally, you need to register the saver in the [ResourceSaver](godot::engine::ResourceSaver)
+/// singleton at Godot runtime initialization. Recommended way of registration is to call
+/// `GdResourceSaver::register_saver()` associated function in [ExtensionLibrary](godot::prelude::ExtensionLibrary)
 /// implementation:
 /// 
 /// ```no_run
+/// use godot_io::traits::GdRonSaver;
+/// 
 /// struct MyGdExtension;
 ///
 /// unsafe impl ExtensionLibrary for MyGdExtension {
@@ -94,19 +96,19 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 
 }
 
-/// Macro used to implement [ronres_defs::traits::GdRonLoader] trait for
-/// a bare rust-defined [godot::engine::ResourceFormatLoader], allowing
+/// Macro used to implement [GdRonLoader](godot_io_defs::traits::GdRonLoader) trait for
+/// a bare rust-defined [ResourceFormatLoader](godot::engine::ResourceFormatLoader), allowing
 /// registered resources deriving [GdRonResource] to be saved with it
 /// into `.gdron` file.
 /// 
 /// Alongside implementing above trait, macro also implements
-/// [godot::engine::ResourceFormatLoaderVirtual], so you shouldn't
+/// [ResourceFormatLoaderVirtual](godot::engine::ResourceFormatLoaderVirtual), so you shouldn't
 /// implement it yourself.
 /// 
 /// ## Macro attributes
-/// - `#[uid_map(MY_UID_MAP)]` - requires providing [ronres_defs::types::UidMap]
+/// - `#[uid_map(MY_UID_MAP)]` - requires providing [UidMap](godot_io_defs::types::UidMap)
 /// `static`, which holds the unique identifiers of saved and loaded
-/// resources. Can be created easily with [macro@ronres_uid_map] macro.
+/// resources. Can be created easily with [macro@godot_io_uid_map] macro.
 /// The same object should be provided for [GdRonSaver] handling the
 /// same resources
 /// - `#[register(MyGdRonResource, MySecondResource)]` - registers Resources
@@ -123,7 +125,7 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 /// #[godot_api]
 /// impl TestStruct {}
 ///
-/// #[ronres_uid_map]
+/// #[godot_io_uid_map]
 /// static HELLO_WORLD: UidMap;
 ///
 /// #[derive(GodotClass, GdRonLoade)]
@@ -137,9 +139,9 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 /// 
 /// To make the Loader recognizable by editor, remember to all `tool`
 /// value to the `GodotClass` macro `#[class]` attribute.
-/// Additionally, you need to register the loader in the [godot::engine::ResourceLoader]
-/// singleton at Godot runtime initialization. Recommended way is calling
-/// `GdResourceLoader::register_loader()` associated function in [godot::prelude::ExtensionLibrary]
+/// Additionally, you need to register the loader in the [ResourceLoader](godot::engine::ResourceLoader)
+/// singleton at Godot runtime initialization. Recommended way of registration is to call
+/// `GdResourceLoader::register_loader()` associated function in [ExtensionLibrary](godot::prelude::ExtensionLibrary)
 /// implementation:
 /// 
 /// ```no_run
@@ -160,17 +162,17 @@ pub fn derive_ron_loader(input: TokenStream) -> TokenStream {
 
 }
 
-/// Macro used to create valid `UidMap` of resources. One `UidMap`
-/// should be used for both `RonSaver` and `RonLoader` supporting
-/// the same Resources.
+/// Macro used to create valid [UidMap](godot_io_defs::types::UidMap) of resources. One `UidMap`
+/// should be used for both [GdRonSaver] and [GdRonLoader] derivates supporting
+/// the same [Resources](godot::engine::Resource).
 /// 
 ///  ```no_run
-/// #[ronres_uid_map]
+/// #[godot_io_uid_map]
 /// static MY_UID_MAP: UidMap;
 /// ```
 
 #[proc_macro_attribute]
-pub fn ronres_uid_map(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn godot_io_uid_map(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     translate(input, uid_map::transform_uid_map)
 

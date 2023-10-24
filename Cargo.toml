@@ -1,9 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
-  "ronres",
-  "ronres-defs",
-  "ronres-derive",
+  "godot_io",
+  "godot_io_defs",
+  "godot_io_derive",
 
   "tests"
 ]

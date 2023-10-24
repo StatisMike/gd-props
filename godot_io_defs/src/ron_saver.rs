@@ -1,4 +1,8 @@
-use godot::{prelude::{GodotClass, Inherits, Object}, obj::{Gd, dom::UserDomain, cap::GodotInit}, engine::{Engine, ResourceFormatSaver}};
+use godot::{
+  prelude::{GodotClass, Inherits, Object}, 
+  obj::{Gd, dom::UserDomain, cap::GodotInit}, 
+  engine::{Engine, ResourceFormatSaver}
+};
 
 pub trait GdRonSaver 
 where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFormatSaver> + Inherits<Object> {
@@ -25,8 +29,8 @@ where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFor
   }
 
   /// Associated function to register the created [ResourceFormatSaver]
-  /// in Godot's [godot::engine::ResourceSaver]. To be used in 
-  /// [godot::prelude::ExtensionLibrary] implementation.
+  /// in Godot's [ResourceSaver](godot::engine::ResourceSaver). To be used in 
+  /// [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation.
   /// 
   /// ## Example
   /// ```no_run

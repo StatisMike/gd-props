@@ -1,8 +1,8 @@
 //! Module containing additional serialization and deserialization
 //! methods for Godot objects.
 
-/// Module that can be used to serialize and deserialize
-/// [godot::obj::Gd] for objects castable to [godot::engine::Resource].
+/// Module that can be used to serialize and deserialize objects castable 
+/// to [Resouce](godot::engine::Resource) on basis of their [Gd](godot::obj::Gd).
 /// 
 /// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on
 /// resources containing pointers to other resources, while
@@ -25,7 +25,7 @@
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="ronres::serde_gd::gd")]
+///     #[serde(with="godot_io::serde_gd::gd")]
 ///     inner: Gd<InnerResource>
 /// }
 /// 
@@ -59,15 +59,12 @@ pub mod gd {
   }
 }
 
-/// Module that can be used to serialize and deserialize
-/// [Option<godot::obj::Gd>] for objects castable to [godot::engine::Resource].
+/// Module that can be used to serialize and deserialize objects castable 
+/// to [Resouce](godot::engine::Resource) on basis of their [Option]<[Gd](godot::obj::Gd)>.
 /// 
 /// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on
 /// resources containing optional pointers to other resources, while
-/// keeping data from every one (if attached)
-/// 
-/// Better to use with *exported* fields to Godot, as you can
-/// attach resources freely using the editor.
+/// keeping data from every one (if attached).
 /// 
 /// ## Example
 /// 
@@ -86,7 +83,7 @@ pub mod gd {
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(init, base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="ronres::serde_gd::gd_option")]
+///     #[serde(with="godot_io::serde_gd::gd_option")]
 ///     #[export]
 ///     inner: Option<Gd<InnerResource>>
 /// }
