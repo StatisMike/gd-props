@@ -4,6 +4,9 @@ pub mod serde_gd;
 mod ron_loader;
 mod ron_saver;
 pub mod errors;
+pub mod serde_new;
+pub mod gd_save;
+pub mod gd_serializer;
 
 pub(crate) const GD_RON_START: & str = "gd=[";
 pub(crate) const GD_RON_END: & str = "]=";

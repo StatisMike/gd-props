@@ -1,15 +1,43 @@
-use godot::{prelude::{GodotClass, GodotString, Variant, Gd, godot_print, ToGodot}, obj::dom::UserDomain, engine::{file_access::ModeFlags, FileAccess, global::Error}};
+use godot::{
+  prelude::{GodotClass, GodotString, Variant, Gd, godot_print, ToGodot, Inherits, Resource}, 
+  obj::dom::UserDomain, 
+  engine::{file_access::ModeFlags, FileAccess, global::Error}
+};
 use ron::{ser, de};
 use serde::{Serialize, Deserialize};
 
 use crate::{GD_RON_START, GD_RON_END};
+
+struct GdRonResourceHeader {
+  pub name: String,
+  pub uid: String,
+}
+
+impl GdRonResourceHeader {
+  const HEADER_PATTERN: &str = "gd=[{}]=uid=[{}]";
+
+  pub fn new(name: String, uid: String) -> Self {
+    Self {
+      name,
+      uid
+    }
+  }
+
+  // pub fn from_str(line: &str) -> Self {
+    
+  // }
+}
+
+fn create_gd_ron_resource_header(name: &str, uid: &str) -> String {
+  format!("gd=[{}]=uid=[{}]", name, uid)
+}
 
 /// Trait which provides methods to serialize and deserialize
 /// rust-defined [Resource](godot::engine::Resource) to `gdron` files, 
 /// based on [ron]
 pub trait GdRonResource
 where 
-Self: Serialize + for<'de> Deserialize<'de> + GodotClass<Declarer = UserDomain> {
+Self: Serialize + for<'de> Deserialize<'de> + GodotClass<Declarer = UserDomain> + Inherits<Resource> {
 
 
   /// Struct identifier included in `gdron` file

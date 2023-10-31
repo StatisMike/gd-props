@@ -47,6 +47,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
           Ok(struct_name) => {
             #(
               if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
+                println!("Loading!");
                 return #registers::load_ron(path);
               }
             )*
@@ -56,11 +57,13 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
 
       fn get_resource_uid(&self, path: godot::builtin::GodotString) -> i64 {
-        *#uid_map
+        let uid = *#uid_map
         .lock()
         .unwrap()
         .get(&String::from(&path))
-        .unwrap_or(&-1)
+        .unwrap_or(&-1);
+        println!("Got UID: {}", uid);
+        return uid;
       }
     }
 

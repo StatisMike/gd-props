@@ -22,6 +22,7 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
         let class = resource.get_class();
         #(
           if class.eq(&godot::builtin::GodotString::from(stringify!(#registers))) {
+            println!("Saving!");
               return resource.cast::<#registers>().bind().save_ron(path);
           }
         )*
@@ -43,6 +44,7 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
       }
 
       fn set_uid(&mut self, path: godot::builtin::GodotString, uid: i64) -> godot::engine::global::Error {
+        println!("Setting UID: {}", uid);
         #uid_map.lock().unwrap().insert(String::from(&path), uid);
         godot::engine::global::Error::OK
       }

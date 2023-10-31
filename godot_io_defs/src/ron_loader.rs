@@ -1,13 +1,7 @@
 use godot::{
-  prelude::{
-    GodotClass, Inherits, Object, GodotString, Gd
-  }, 
-  obj::{
-    dom::UserDomain, cap::GodotInit
-  }, 
-  engine::{
-    ResourceFormatLoader, FileAccess, file_access::ModeFlags, Engine
-  }
+  prelude::{GodotClass, Inherits, Object, GodotString, Gd}, 
+  obj::{dom::UserDomain, cap::GodotInit}, 
+  engine::{ResourceFormatLoader, FileAccess, file_access::ModeFlags, Engine}
 };
 
 use crate::{errors::GdRonError, GD_RON_START, GD_RON_END};
