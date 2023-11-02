@@ -6,7 +6,6 @@ use crate::utils::RonSaverLoaderAttributes;
 pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
   let RonSaverLoaderAttributes { 
-    uid_map, 
     registers 
   } = RonSaverLoaderAttributes::declare(&decl)?;
 
@@ -31,7 +30,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
 
       fn get_resource_type(&self, path: godot::builtin::GodotString) -> godot::builtin::GodotString {
-        if let Ok(struct_name) = Self::read_ident_from_ron_file(path) {
+        if let Ok(struct_name) = self._int_get_type(path) {
           #(
             if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
               return godot::builtin::GodotString::from(stringify!(#registers));
@@ -42,7 +41,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
 
       fn load(&self, path: godot::builtin::GodotString, _original_path: godot::builtin::GodotString, _use_sub_threads: bool, _cache_mode: i32) -> godot::builtin::Variant {
-        match Self::read_ident_from_ron_file(path.clone()) {
+        match self._int_get_type(path.clone()) {
           Err(error) => godot::prelude::godot_error!("Error getting '{}' resource type during load: {}", path, error),
           Ok(struct_name) => {
             #(
@@ -57,13 +56,7 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
       }
 
       fn get_resource_uid(&self, path: godot::builtin::GodotString) -> i64 {
-        let uid = *#uid_map
-        .lock()
-        .unwrap()
-        .get(&String::from(&path))
-        .unwrap_or(&-1);
-        println!("Got UID: {}", uid);
-        return uid;
+        self._int_get_uid(path)
       }
     }
 

@@ -1,8 +1,10 @@
 use godot::{
-  prelude::{GodotClass, Inherits, Object}, 
+  prelude::{GodotClass, Inherits, Object, GodotString, godot_print, godot_error}, 
   obj::{Gd, dom::UserDomain, cap::GodotInit}, 
-  engine::{Engine, ResourceFormatSaver}
+  engine::{Engine, ResourceFormatSaver, global::Error, ResourceUid}
 };
+
+use crate::gd_meta::GdMeta;
 
 pub trait GdRonSaver 
 where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFormatSaver> + Inherits<Object> {
@@ -49,4 +51,51 @@ where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFor
     let saver = &mut godot::engine::ResourceSaver::singleton();
     saver.add_resource_format_saver(instance.upcast::<ResourceFormatSaver>());
   }
+
+  /// Internal function. Sets UID in file 
+  fn _int_set_uid(&mut self, path: GodotString, uid: i64) -> Error {
+    godot_print!("Setting uid: {} for path: {}",uid, path.clone());
+    let meta_res = GdMeta::read_from_gdron_header(path.clone());
+
+    match meta_res {
+      Ok(mut meta) => {
+        let mut resource_uid = ResourceUid::singleton();
+        let old_uid = resource_uid.text_to_id(GodotString::from(&meta.uid));
+
+        let uid_exists = resource_uid.has_id(uid);
+        let old_uid_exists = resource_uid.has_id(old_uid);
+
+        if uid_exists && !resource_uid.get_id_path(uid).eq(&path) {
+          godot_error!("Other resource of this UID already exists! {}", uid);
+          return Error::ERR_ALREADY_EXISTS;
+        }
+
+        meta.uid = resource_uid.id_to_text(uid).to_string();
+        let write_res = meta.write_to_gdron_header(path.clone());
+
+        if write_res.is_err() {
+          return Error::ERR_FILE_CANT_WRITE;
+        }
+
+        if old_uid_exists {
+          resource_uid.remove_id(old_uid);
+        }
+
+        if uid_exists {
+          resource_uid.set_id(uid, path);
+        } else {
+          resource_uid.add_id(uid, path);
+        }
+
+        Error::OK
+        
+      },
+      Err(error) => {
+        godot_error!("{}", error);
+        Error::ERR_FILE_CANT_READ
+      }
+    }
+  }
+
+
 }

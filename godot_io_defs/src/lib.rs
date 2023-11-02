@@ -7,9 +7,7 @@ pub mod errors;
 pub mod serde_new;
 pub mod gd_save;
 pub mod gd_serializer;
-
-pub(crate) const GD_RON_START: & str = "gd=[";
-pub(crate) const GD_RON_END: & str = "]=";
+pub mod gd_meta;
 
 pub mod traits {
   pub use super::ron_resource::GdRonResource;

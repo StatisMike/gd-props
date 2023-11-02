@@ -7,7 +7,6 @@ mod ron_resource;
 pub(crate) mod ron_saver;
 pub(crate) mod ron_loader;
 pub(crate) mod utils;
-pub(crate) mod uid_map;
 
 /// Macro used to implement [GdRonResource](godot_io_defs::traits::GdRonResource) trait, which makes 
 /// a rust-defined godot [Resource](godot::engine::Resource) serializable
@@ -38,11 +37,6 @@ pub fn derive_ron_resource(input: TokenStream) -> TokenStream {
 /// implement it yourself.
 /// 
 /// ## Macro attributes
-/// - `#[uid_map(MY_UID_MAP)]` - requires providing [UidMap](godot_io_defs::types::UidMap)
-/// `static`, which holds the unique identifiers of saved and loaded
-/// resources. Can be created easily with [macro@godot_io_uid_map] macro.
-/// The same object should be provided for [GdRonLoader] handling the
-/// same resources
 /// - `#[register(MyGdRonResource, MySecondResource)]` - registers Resources
 /// deriving [GdRonResource] to be handled by this struct. You can provide
 /// multiple resources in one attribute, you can also add multiple `register`
@@ -57,12 +51,9 @@ pub fn derive_ron_resource(input: TokenStream) -> TokenStream {
 /// #[godot_api]
 /// impl TestStruct {}
 ///
-/// #[godot_io_uid_map]
-/// static HELLO_WORLD: UidMap;
 ///
 /// #[derive(GodotClass, GdRonSaver)]
 /// #[class(init, tool, base=ResourceFormatSaver)]
-/// #[uid_map(HELLO_WORLD)]
 /// #[register(TestStruct)]
 /// pub struct MyRonSaver {}
 /// ```
@@ -89,7 +80,7 @@ pub fn derive_ron_resource(input: TokenStream) -> TokenStream {
 ///     }
 /// } 
 /// ```
-#[proc_macro_derive(GdRonSaver, attributes(register, uid_map))]
+#[proc_macro_derive(GdRonSaver, attributes(register))]
 pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 
     translate(input, ron_saver::derive_ron_saver)
@@ -106,11 +97,6 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 /// implement it yourself.
 /// 
 /// ## Macro attributes
-/// - `#[uid_map(MY_UID_MAP)]` - requires providing [UidMap](godot_io_defs::types::UidMap)
-/// `static`, which holds the unique identifiers of saved and loaded
-/// resources. Can be created easily with [macro@godot_io_uid_map] macro.
-/// The same object should be provided for [GdRonSaver] handling the
-/// same resources
 /// - `#[register(MyGdRonResource, MySecondResource)]` - registers Resources
 /// deriving [GdRonResource] to be handled by this struct. You can provide
 /// multiple resources in one attribute, you can also add multiple `register`
@@ -125,12 +111,8 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 /// #[godot_api]
 /// impl TestStruct {}
 ///
-/// #[godot_io_uid_map]
-/// static HELLO_WORLD: UidMap;
-///
 /// #[derive(GodotClass, GdRonLoade)]
 /// #[class(init, tool, base=ResourceFormatLoader)]
-/// #[uid_map(HELLO_WORLD)]
 /// #[register(TestStruct)]
 /// pub struct MyRonLoader {}
 /// ```
@@ -155,26 +137,10 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 ///     }
 /// }
 /// ```
-#[proc_macro_derive(GdRonLoader, attributes(register, uid_map))]
+#[proc_macro_derive(GdRonLoader, attributes(register))]
 pub fn derive_ron_loader(input: TokenStream) -> TokenStream {
 
     translate(input, ron_loader::derive_ron_loader)
-
-}
-
-/// Macro used to create valid [UidMap](godot_io_defs::types::UidMap) of resources. One `UidMap`
-/// should be used for both [GdRonSaver] and [GdRonLoader] derivates supporting
-/// the same [Resources](godot::engine::Resource).
-/// 
-///  ```no_run
-/// #[godot_io_uid_map]
-/// static MY_UID_MAP: UidMap;
-/// ```
-
-#[proc_macro_attribute]
-pub fn godot_io_uid_map(_attr: TokenStream, input: TokenStream) -> TokenStream {
-
-    translate(input, uid_map::transform_uid_map)
 
 }
 

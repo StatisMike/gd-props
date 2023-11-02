@@ -7,7 +7,6 @@ use crate::utils::RonSaverLoaderAttributes;
 pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
   let RonSaverLoaderAttributes { 
-    uid_map, 
     registers 
   } = RonSaverLoaderAttributes::declare(&decl)?;
 
@@ -44,9 +43,7 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
       }
 
       fn set_uid(&mut self, path: godot::builtin::GodotString, uid: i64) -> godot::engine::global::Error {
-        println!("Setting UID: {}", uid);
-        #uid_map.lock().unwrap().insert(String::from(&path), uid);
-        godot::engine::global::Error::OK
+        self._int_set_uid(path, uid)
       }
     }
 
