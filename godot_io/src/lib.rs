@@ -2,7 +2,6 @@ pub mod macros {
     pub use godot_io_derive::GdRonResource;
     pub use godot_io_derive::GdRonLoader;
     pub use godot_io_derive::GdRonSaver;
-    pub use godot_io_derive::godot_io_uid_map;
     
 }
 pub mod traits {

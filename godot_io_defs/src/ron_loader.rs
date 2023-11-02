@@ -6,27 +6,17 @@ use godot::{
     dom::UserDomain, cap::GodotInit
   }, 
   engine::{
-    ResourceFormatLoader, FileAccess, file_access::ModeFlags, Engine
+    ResourceFormatLoader, Engine, ResourceUid
   }
 };
 
-use crate::{errors::GdRonError, GD_RON_START, GD_RON_END};
+use crate::{errors::GdRonError, gd_meta::GdMeta};
 
 pub trait GdRonLoader 
 where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFormatLoader> + Inherits<Object>{
 
   /// Name under which the object registers in Godot as a singleton
   const SINGLETON_NAME: &'static str;
-
-  /// Read ron file header to extract the serialized resource name
-  fn read_ident_from_ron_file(path: GodotString) -> Result<String, GdRonError> {
-    let file = &mut FileAccess::open(path, ModeFlags::READ).ok_or(GdRonError::OpenFile)?;
-    let line = file.get_line().to_string();
-    let start = line.find(GD_RON_START).ok_or(GdRonError::HeaderRead)?;
-    let end = line.find(GD_RON_END).ok_or(GdRonError::HeaderRead)?;
-    let struct_name = line[start+GD_RON_START.len()..start+end].to_string();
-    Ok(struct_name)
-  }
 
   /// Associated function to retrieve the pointer to object singleton
   /// as [Gd]<[ResourceFormatLoader]> .
@@ -67,5 +57,22 @@ where Self: GodotClass<Declarer = UserDomain> + GodotInit + Inherits<ResourceFor
     let instance = Self::loader_singleton();
     let loader = &mut godot::engine::ResourceLoader::singleton();
     loader.add_resource_format_loader(instance.upcast());
+  }
+
+  /// Internal method to get resource UID from file
+  fn _int_get_uid(&self, path: GodotString) -> i64 {
+
+    if let Ok(meta) = GdMeta::read_from_gdron_header(path) {
+      let resource_uid = ResourceUid::singleton();
+      return resource_uid.text_to_id(GodotString::from(meta.uid));
+    };
+    -1
+  }
+
+  /// Internal method to get resource type from file
+  fn _int_get_type(&self, path: GodotString) -> Result<String, GdRonError> {
+    let meta = GdMeta::read_from_gdron_header(path)?;
+
+    Ok(meta.gd_class)
   }
 }

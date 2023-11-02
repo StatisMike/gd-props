@@ -1,8 +1,8 @@
-use godot::{prelude::{GodotClass, GodotString, Variant, Gd, godot_print, ToGodot}, obj::dom::UserDomain, engine::{file_access::ModeFlags, FileAccess, global::Error}};
+use godot::{prelude::{GodotClass, GodotString, Variant, Gd, godot_print, ToGodot}, obj::dom::UserDomain, engine::{file_access::ModeFlags, FileAccess, global::Error, ResourceUid}};
 use ron::{ser, de};
 use serde::{Serialize, Deserialize};
 
-use crate::{GD_RON_START, GD_RON_END};
+use crate::gd_meta::GdMeta;
 
 /// Trait which provides methods to serialize and deserialize
 /// rust-defined [Resource](godot::engine::Resource) to `gdron` files, 
@@ -19,12 +19,46 @@ Self: Serialize + for<'de> Deserialize<'de> + GodotClass<Declarer = UserDomain> 
   /// ## Arguments
   /// - `path`: [GodotString] - path to the file
   fn save_ron(&self, path: GodotString) -> Error {
-    if let Some(access) = &mut FileAccess::open(path.clone(), ModeFlags::WRITE) {
+    let mut uid = -1;
+      let mut resource_uid = ResourceUid::singleton();
 
-      if let Ok(serialized) = ser::to_string_pretty(self, ser::PrettyConfig::default()) {
-        access.store_string(GodotString::from(format!("{}{}{}\n", GD_RON_START, Self::RON_FILE_HEAD_IDENT, GD_RON_END)));
-        access.store_string(GodotString::from(serialized));
+      // Check if resource already exists and have UID assigned
+      if let Ok(meta) = GdMeta::read_from_gdron_header(path.clone()) {
+        godot_print!("Got old UID: {}", meta.uid);
+        uid = resource_uid.text_to_id(GodotString::from(meta.uid));
+      }
+      // If UID couldn't be retrieved, or retrieved UID points to other path
+      // create new UID
+      if uid == -1 || (resource_uid.has_id(uid) && !resource_uid.get_id_path(uid).eq(&path)) {
+        uid = resource_uid.create_id();
+        godot_print!("Created new UID: {}", uid);
+      }
+
+      let meta = GdMeta {
+        gd_class: Self::RON_FILE_HEAD_IDENT.to_string(),
+        uid: resource_uid.id_to_text(uid).to_string(),
+        path: None
+      };
+
+    if let Some(access) = &mut FileAccess::open(path.clone(), ModeFlags::WRITE) {
+      
+      if let (Ok(ser_obj), Ok(ser_meta)) = (
+        ser::to_string_pretty(self, ser::PrettyConfig::default()),
+        ser::to_string(&meta)
+      ) {
+
+        access.store_line(GodotString::from(ser_meta));
+        access.store_string(GodotString::from(ser_obj));
         access.close();
+
+        // Add new UID only after everything else went OK
+        let uid_exists = resource_uid.has_id(uid);
+        if uid_exists {
+          resource_uid.set_id(uid, path)
+        } else {
+          resource_uid.add_id(uid, path);
+        }
+        
         return Error::OK;
       } 
       return Error::ERR_CANT_CREATE;

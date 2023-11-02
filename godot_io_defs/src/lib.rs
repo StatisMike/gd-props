@@ -4,9 +4,7 @@ pub mod serde_gd;
 mod ron_loader;
 mod ron_saver;
 pub mod errors;
-
-pub(crate) const GD_RON_START: & str = "gd=[";
-pub(crate) const GD_RON_END: & str = "]=";
+pub mod gd_meta;
 
 pub mod traits {
   pub use super::ron_resource::GdRonResource;

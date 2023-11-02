@@ -66,12 +66,6 @@ mod tests {
     }
     
     #[test]
-    fn uid_map_can_be_created() {
-        #[godot_io_uid_map]
-        static HELLO_WORLD: UidMap;
-    }
-    
-    #[test]
     fn ron_loader_can_be_implemented() {
     
         #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
@@ -88,11 +82,7 @@ mod tests {
         #[godot_api]
         impl TestStruct2 {}
     
-        #[godot_io_uid_map]
-        static HELLO_WORLD: UidMap;
-    
         #[derive(GodotClass, GdRonLoader)]
-        #[uid_map(HELLO_WORLD)]
         #[class(init, tool, base=ResourceFormatLoader)]
         #[register(TestStruct)]
         #[register(TestStruct2)]
@@ -119,12 +109,9 @@ mod tests {
         #[godot_api]
         impl TestStruct2 {}
     
-        #[godot_io_uid_map]
-        static HELLO_WORLD: UidMap;
     
         #[derive(GodotClass)]
         #[derive(GdRonSaver)]
-        #[uid_map(HELLO_WORLD)]
         #[class(init, tool, base=ResourceFormatSaver)]
         #[register(TestStruct)]
         #[register(TestStruct2)]

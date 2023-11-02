@@ -11,7 +11,6 @@ This crate is born from this frustration and its goal is to provide tools to sav
 > This crate is early in development and its API can certainly change. Contributions, discussions and informed opinions are very welcome.
 
 Features that will be certainly expanded upon:
-- integrate into unique identifiers functionality of Godot
 - make current forced `BUNDLE_RESOURCES` behaviour optional, and if so save nested resources as their `Uid` (at least for `.gdron` files)
 - add support for more compact formats, like binary and binary compressed
  
@@ -44,19 +43,19 @@ I presume that you saw the `GdRonResource` derive macro there, though. It implem
 `.gdron` is a very slightly modified `ron` file - it's only change is an inclusion of a header containing the struct identifier (or resource type identifier in Godot terms). For a random object of above structure it would look like that:
 
 ```
-gd=[Statistics]=
+(gd_class:"Statistics",uid:"uid://bwgy4ec84b8xv")
 (
-    level: 0,
+    level: 3,
     stats: {
-        Dex: 7,
-        Agi: 11,
-        Str: 9,
-        Lck: 7,
-        HP: 14,
         Mv: 0,
-        Mag: 5,
-        Def: 3,
-        Res: 7,
+        Lck: 7,
+        Def: 7,
+        Mag: 7,
+        Agi: 9,
+        HP: 28,
+        Res: 3,
+        Dex: 7,
+        Str: 7,
     },
     exp: 0,
     bane: 4,
@@ -81,24 +80,24 @@ pub struct CharacterData {
 ```
 `godot_io::serde_gd::gd_option` is a provided module that allows serializing the nested resource. When saving the `CharacterData` we will now get a file as below: 
 ```
-gd=[CharacterData]=
+(gd_class:"CharacterData",uid:"uid://dfa37uvpqlnhq")
 (
     affiliation: Player,
     statistics: Some((
-        level: 0,
+        level: 3,
         stats: {
-            Def: 5,
-            Res: 11,
-            Agi: 7,
-            Mv: 0,
-            HP: 5,
-            Str: 11,
+            Def: 7,
+            Dex: 7,
             Lck: 7,
             Mag: 7,
-            Dex: 5,
+            Res: 3,
+            Mv: 0,
+            HP: 28,
+            Agi: 9,
+            Str: 7,
         },
         exp: 0,
-        bane: 6,
+        bane: 4,
         effect_mods: {},
         item_mods: {},
         class_mods: (
@@ -116,8 +115,6 @@ As we now have rust Resources fully Serializable to `.gdron`, we now need a tool
 ```rust
 // The derive itself
 #[derive(GdRonSaver)]
-// Macro attribute to provide UidMap to hold the identifiers of Resources. Same UID map should be provided for both Saver and Loader
-#[uid_map(MY_UID_MAP)]
 // Attribute to register the GdRonResources to be handled by given Saver/Loader
 #[register(CharacterData, Statistics)]
 // Multiple `register` macro attributes could be provided, all identifiers contained within will be registered
@@ -125,13 +122,8 @@ As we now have rust Resources fully Serializable to `.gdron`, we now need a tool
 ```
 Full example - defining both Saver and Loader:
 ```rust
-/// Attribute macro included :)
-#[godot_io_uid_map]
-static RON_UID: UidMap;
-
 #[derive(GodotClass, GdRonSaver)]
 #[class(base=ResourceFormatSaver, init, tool)]
-#[uid_map(RON_UID)]
 #[register(CharacterData, Statistics)]
 pub struct CustomRonSaver {}
 
@@ -140,7 +132,6 @@ impl CustomRonSaver {}
 
 #[derive(GodotClass, GdRonLoader)]
 #[class(base=ResourceFormatLoader, init, tool)]
-#[uid_map(RON_UID)]
 #[register(CharacterData)]
 #[register(Statistics)]
 pub struct CustomRonLoader {}
