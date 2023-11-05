@@ -1,50 +1,61 @@
-use godot::{prelude::GodotString, engine::{FileAccess, file_access::ModeFlags}};
-use serde::{Serialize, Deserialize};
+use godot::{
+    engine::{file_access::ModeFlags, FileAccess},
+    prelude::GodotString,
+};
+use serde::{Deserialize, Serialize};
 
 use crate::errors::GdRonError;
 
 #[derive(Serialize, Deserialize)]
-pub (crate) struct GdMeta {
-  pub gd_class: String,
-  pub uid: String,
-  #[serde(skip_serializing_if="Option::is_none")]
-  pub path: Option<String>,
+pub(crate) struct GdMetaHeader {
+    pub gd_class: String,
+    pub uid: String,
 }
 
-impl GdMeta {
+impl GdMetaHeader {
+    pub fn read_from_gdron_header(path: GodotString) -> Result<Self, GdRonError> {
+        let fa = FileAccess::open(path.clone(), ModeFlags::READ);
+        if fa.is_none() {
+            return Err(GdRonError::OpenFileRead);
+        }
+        let mut fa = fa.unwrap();
+        let line = fa.get_line().to_string();
+        fa.close();
+        let meta = ron::from_str::<GdMetaHeader>(&line);
 
-  ///
-  pub fn read_from_gdron_header(path: GodotString) -> Result<Self, GdRonError> {
-
-    let fa = FileAccess::open(path.clone(), ModeFlags::READ);
-    if fa.is_none() {
-      return Err(GdRonError::OpenFileRead);
+        if let Err(error) = meta {
+            return Err(GdRonError::HeaderDeserialize(error));
+        }
+        Ok(meta.unwrap())
     }
-    let mut fa = fa.unwrap();
-    let line = fa.get_line().to_string();
-    fa.close();
-    let meta = ron::from_str::<GdMeta>(&line);
 
-    if let Err(error) = meta {
-      return Err(GdRonError::HeaderDeserialize(error));
+    pub fn write_to_gdron_header(&self, path: GodotString) -> Result<(), GdRonError> {
+        let ser_res = ron::to_string(&self);
+        if ser_res.is_err() {
+            return Err(GdRonError::HeaderSerialize);
+        }
+        let ser = ser_res.unwrap();
+
+        let fa = FileAccess::open(path, ModeFlags::READ_WRITE);
+        if fa.is_none() {
+            return Err(GdRonError::OpenFileWrite);
+        }
+        let mut fa = fa.unwrap();
+
+        fa.store_line(GodotString::from(ser));
+        Ok(())
     }
-    Ok(meta.unwrap())
-  }
+}
 
-  pub fn write_to_gdron_header(&self, path: GodotString) -> Result<(), GdRonError> {
-    let ser_res = ron::to_string(&self);
-    if ser_res.is_err() {
-      return Err(GdRonError::HeaderSerialize);
-    }
-    let ser = ser_res.unwrap();
+#[derive(Serialize, Deserialize)]
+pub(crate) struct GdMetaExt {
+    pub gd_class: String,
+    pub uid: String,
+    pub path: String
+}
 
-    let fa = FileAccess::open(path, ModeFlags::READ_WRITE);
-    if fa.is_none() {
-      return Err(GdRonError::OpenFileWrite);
-    }
-    let mut fa = fa.unwrap();
-
-    fa.store_line(GodotString::from(ser));
-    Ok(())
-  }
+#[derive(Serialize, Deserialize)]
+pub(crate) enum GdExtResource {
+    ExtResource(GdMetaExt),
+    None,
 }
