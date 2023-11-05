@@ -11,9 +11,9 @@ This crate is born from this frustration and its goal is to provide tools to sav
 > This crate is early in development and its API can certainly change. Contributions, discussions and informed opinions are very welcome.
 
 Features that will be certainly expanded upon:
-- make current forced `BUNDLE_RESOURCES` behaviour optional, and if so save nested resources as their `Uid` (at least for `.gdron` files)
 - add support for more compact formats, like binary and binary compressed
- 
+- make the `gdron` format interchangeable with future binary/binary compressed (for release mode)
+- make everything work smoothly in compiled game (especially pointers to `.tres` resources)
 
 ## GdRonResource macro
 So, imagine that you have a Resouce with a structure similiar to one below. You could potentially transform `HashMap` into Godot's Dictionary, but you would also sacrifice some of its pros. Though other structs, like `StatModifiers` which you don't intend to handle like a `Resource` is sure to be lost if saving resource with Godot's resource saver.
@@ -38,7 +38,7 @@ pub struct Statistics {
   pub class_mods: StatModifiers,
 }
 ```
-I presume that you saw the `GdRonResource` derive macro there, though. It implements currently main useful trait of this crate. It makes the Resource saveable with our custom saver straight to `.gdron` file.
+I presume that you saw the `GdRonResource` derive macro there, though. It implements `GdRonResource` trait, and makes the Resource saveable with our custom saver straight to `.gdron` file.
 
 `.gdron` is a very slightly modified `ron` file - it's only change is an inclusion of a header containing the struct identifier (or resource type identifier in Godot terms). For a random object of above structure it would look like that:
 
@@ -66,7 +66,18 @@ I presume that you saw the `GdRonResource` derive macro there, though. It implem
     ),
 )
 ```
-File is recognizable by Godot editor, could be loaded through it and attached to a node or other Resource. Which lead to another question: what if you want to preserve the `statistics` field alongside the whole `CharacterData` resource, like below?
+File is recognizable by Godot editor, could be loaded through it and attached to a node or other Resource.
+
+## Bundled resources
+What if we have a Resource which contains another resource, which we would want to save as a bundled resource? There are two modules that handle this case: 
+- `godot_io::serde_gd::gd_option` - for `Option<Gd<T>>` fields
+- `godot_io::serde_gd::gd` - for `Gd<T>` fields.
+
+There are some requirements for this to work:
+- `T` needs to be User-defined `GodotClass` inheriting from `Resource`
+- `T` needs to derive `Serialize` and `Deserialize`
+  
+### Example
 ```rust
 #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
 #[class(base=Resource)]
@@ -78,7 +89,7 @@ pub struct CharacterData {
     statistics: Option<Gd<Statistics>>,
 }
 ```
-`godot_io::serde_gd::gd_option` is a provided module that allows serializing the nested resource. When saving the `CharacterData` we will now get a file as below: 
+Upon saving, we receive file as below:
 ```
 (gd_class:"CharacterData",uid:"uid://dfa37uvpqlnhq")
 (
@@ -106,7 +117,58 @@ pub struct CharacterData {
     )),
 )
 ```
-There is also `godot_io::serde_gd::gd` module, handling `Gd<GodotClass>` fields.
+
+## External Resources
+All right, but what if we would like to preserve the sub resource as an External Resource, just in a way that regular resource saving in Godot works? It is possible with two additional modules:
+
+- `godot_io::serde_gd::ext_option` - for `Option<Gd<T>>` fields
+- `godot_io::serde_gd::ext` - for `Gd<T>` fields.
+
+There are some requirements for this to work:
+- `T` needs to be a `Resource`
+- `T` needs to be a standalone `Resource` (needs to be saved to a file and loadable from it)
+
+This approach has numerous benefits:
+- `T` doesn't need to be a User-defined `GodotClass` (so built-in resources will work)
+- External Resource instance will be reused whenever it is referenced
+
+### Example
+```rust
+#[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
+#[class(base=Resource)]
+pub struct CharacterData {
+    #[export]
+    affiliation: CharacterAffiliation,
+    // As `statistics` is User-defined Resource, we could also use `gd_option` module
+    #[export]
+    #[serde(with="godot_io::serde_gd::ext_option")]
+    statistics: Option<Gd<Statistics>>,
+    #[export]
+    #[serde(with="godot_io::serde_gd::ext_option")]
+    nothing_is_here: Option<Gd<Resource>>,
+    #[export]
+    #[serde(with="godot_io::serde_gd::ext_option")]
+    texture: Option<Gd<CompressedTexture2D>>,
+}
+```
+Upon saving, we receive file as below:
+```
+(gd_class:"CharacterData",uid:"uid://dfa37uvpqlnhq")
+(
+    affiliation: Player,
+    statistics: ExtResource((
+        gd_class: "Statistics",
+        uid: "uid://dixv2uvh8waug",
+        path: "res://statistics.gdron",
+    )),
+    nothing_is_here: None,
+    texture: ExtResource((
+        gd_class: "CompressedTexture2D",
+        uid: "uid://ci3y6557pn0o",
+        path: "res://icon.svg",
+    )),
+)
+```
 
 ## GdRonSaver and GdRonLoader macros
 As we now have rust Resources fully Serializable to `.gdron`, we now need a tools for saving and loading them - default `ResourceSaver` and `ResourceLoader` don't know and won't recognize our `.gdron` files.
