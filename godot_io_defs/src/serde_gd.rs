@@ -197,11 +197,9 @@ pub mod ext {
         T: GodotClass + Inherits<Resource>,
     {
         if let GdExtResource::ExtResource(meta) = GdExtResource::deserialize(deserializer)? {
-            let mut loader = godot::engine::ResourceLoader::singleton();
-            let obj = loader
-                .load(meta.path.into())
-                .ok_or::<D::Error>(de::Error::custom("cannot load resource from path"))
-                .unwrap();
+            let obj = meta.try_load()
+            .ok_or::<D::Error>(de::Error::custom("cannot load resource"))
+            .unwrap();
 
             Ok(obj.cast::<T>())
         } else {
@@ -280,9 +278,7 @@ pub mod ext_option {
         T: GodotClass + Inherits<Resource>,
     {
         if let GdExtResource::ExtResource(meta) = GdExtResource::deserialize(deserializer)? {
-            let mut loader = godot::engine::ResourceLoader::singleton();
-            let obj = loader
-                .load(meta.path.into())
+            let obj = meta.try_load()
                 .ok_or::<D::Error>(de::Error::custom("cannot load resource from path"))
                 .unwrap();
 
