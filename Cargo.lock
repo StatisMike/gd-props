@@ -122,7 +122,7 @@ source = "git+https://github.com/godot-rust/godot4-prebuilt?branch=4.1.1#fca6897
 
 [[package]]
 name = "godot_io"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "godot",
  "godot_io_defs",
@@ -133,7 +133,7 @@ dependencies = [
 
 [[package]]
 name = "godot_io_defs"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "godot",
  "once_cell",

@@ -6,6 +6,7 @@ mod ron_saver;
 mod bin_saver;
 mod bin_loader;
 mod bin_resource;
+mod file_access;
 pub mod serde_gd;
 pub mod types;
 
