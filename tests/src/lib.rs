@@ -6,7 +6,7 @@ mod tests {
     use serde::{Deserialize, Serialize};
 
     #[test]
-    fn trait_can_be_implemented() {
+    fn ron_trait_can_be_implemented() {
         #[derive(GodotClass, Serialize, Deserialize, GdRonResource)]
         #[class(init, base=Resource)]
         struct TestStruct {}
@@ -112,5 +112,67 @@ mod tests {
         pub struct MyRonSaver {}
 
         assert_eq!(MyRonSaver::SINGLETON_NAME, "MyRonSaver");
+    }
+
+    #[test]
+    fn bin_trait_can_be_implemented() {
+        #[derive(GodotClass, Serialize, Deserialize, GdBinResource)]
+        #[class(init, base=Resource)]
+        struct TestStruct {}
+
+        #[godot_api]
+        impl TestStruct {}
+
+        assert_eq!(TestStruct::BIN_FILE_HEAD_IDENT, "TestStruct");
+    }
+
+    #[test]
+    fn bin_loader_can_be_implemented() {
+        #[derive(GodotClass, Serialize, Deserialize, GdBinResource)]
+        #[class(init, base=Resource)]
+        struct TestStruct {}
+
+        #[godot_api]
+        impl TestStruct {}
+
+        #[derive(GodotClass, Serialize, Deserialize, GdBinResource)]
+        #[class(init, base=Resource)]
+        struct TestStruct2 {}
+
+        #[godot_api]
+        impl TestStruct2 {}
+
+        #[derive(GodotClass, GdBinLoader)]
+        #[class(init, tool, base=ResourceFormatLoader)]
+        #[register(TestStruct)]
+        #[register(TestStruct2)]
+        pub struct MyBinLoader {}
+
+        assert_eq!(MyBinLoader::SINGLETON_NAME, "MyBinLoader");
+    }
+
+    #[test]
+    fn bin_saver_can_be_implemented() {
+        #[derive(GodotClass, Serialize, Deserialize, GdBinResource)]
+        #[class(init, base=Resource)]
+        struct TestStruct {}
+
+        #[godot_api]
+        impl TestStruct {}
+
+        #[derive(GodotClass, Serialize, Deserialize, GdBinResource)]
+        #[class(init, base=Resource)]
+        struct TestStruct2 {}
+
+        #[godot_api]
+        impl TestStruct2 {}
+
+        #[derive(GodotClass, GdBinSaver)]
+        #[class(init, tool, base=ResourceFormatSaver)]
+        #[register(TestStruct)]
+        #[register(TestStruct2)]
+        pub struct MyBinSaver {}
+
+        assert_eq!(MyBinSaver::SINGLETON_NAME, "MyBinSaver");
     }
 }

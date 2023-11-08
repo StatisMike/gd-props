@@ -1,10 +1,10 @@
-use crate::utils::RonSaverLoaderAttributes;
+use crate::utils::SaverLoaderAttributes;
 use proc_macro2::TokenStream;
 use quote::quote;
 use venial::Declaration;
 
 pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
-    let RonSaverLoaderAttributes { registers } = RonSaverLoaderAttributes::declare(&decl)?;
+    let SaverLoaderAttributes { registers } = SaverLoaderAttributes::declare(&decl)?;
 
     let struct_data = decl
         .as_struct()
@@ -45,7 +45,6 @@ pub fn derive_ron_loader(decl: Declaration) -> Result<TokenStream, venial::Error
             Ok(struct_name) => {
               #(
                 if struct_name.eq(#registers::RON_FILE_HEAD_IDENT) {
-                  println!("Loading!");
                   return #registers::load_ron(path);
                 }
               )*

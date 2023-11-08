@@ -7,6 +7,7 @@ pub(crate) mod ron_loader;
 mod ron_resource;
 pub(crate) mod ron_saver;
 pub(crate) mod utils;
+mod bin;
 
 /// Macro used to implement [GdRonResource](godot_io_defs::traits::GdRonResource) trait, which makes
 /// a rust-defined godot [Resource](godot::engine::Resource) serializable
@@ -136,6 +137,21 @@ pub fn derive_ron_saver(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(GdRonLoader, attributes(register))]
 pub fn derive_ron_loader(input: TokenStream) -> TokenStream {
     translate(input, ron_loader::derive_ron_loader)
+}
+
+#[proc_macro_derive(GdBinResource)]
+pub fn derive_bin_resource(input: TokenStream) -> TokenStream {
+    translate(input, bin::derive_bin_resource)
+}
+
+#[proc_macro_derive(GdBinSaver, attributes(register))]
+pub fn derive_bin_saver(input: TokenStream) -> TokenStream {
+    translate(input, bin::derive_bin_saver)
+}
+
+#[proc_macro_derive(GdBinLoader, attributes(register))]
+pub fn derive_bin_loader(input: TokenStream) -> TokenStream {
+    translate(input, bin::derive_bin_loader)
 }
 
 fn translate<F>(input: TokenStream, fun: F) -> TokenStream

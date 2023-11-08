@@ -45,6 +45,35 @@ impl GdMetaHeader {
         fa.store_line(GodotString::from(ser));
         Ok(())
     }
+
+    pub fn write_to_gdbin_header(&self, path: GodotString) -> Result<(), GdRonError> {
+
+        let mut fa = FileAccess::open(path, ModeFlags::READ_WRITE)
+        .ok_or(GdRonError::OpenFileWrite)?;
+
+        self.write_to_gdbin_fa(&mut fa);
+
+        Ok(())
+    }
+
+    pub fn read_from_gdbin_header(path: GodotString) -> Result<Self, GdRonError> {
+        let mut fa = FileAccess::open(path, ModeFlags::READ)
+        .ok_or(GdRonError::OpenFileRead)?;
+        
+        Ok(Self::read_from_gdbin_fa(&mut fa))
+    }
+
+    pub fn write_to_gdbin_fa(&self, fa: &mut Gd<FileAccess>) {
+        fa.store_pascal_string(GodotString::from(&self.gd_class));
+        fa.store_pascal_string(GodotString::from(&self.uid));
+    }
+
+    pub fn read_from_gdbin_fa(fa: &mut Gd<FileAccess>) -> Self {
+        let gd_class = fa.get_pascal_string().to_string();
+        let uid = fa.get_pascal_string().to_string();
+
+        Self { gd_class, uid }
+    }
 }
 
 #[derive(Serialize, Deserialize)]

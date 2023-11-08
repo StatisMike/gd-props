@@ -2,11 +2,11 @@ use proc_macro2::{Ident, TokenTree};
 use venial::{AttributeValue, Declaration};
 
 #[derive(Debug)]
-pub(crate) struct RonSaverLoaderAttributes {
+pub(crate) struct SaverLoaderAttributes {
     pub registers: Vec<proc_macro2::Ident>,
 }
 
-impl RonSaverLoaderAttributes {
+impl SaverLoaderAttributes {
     const REGISTER_PATH: &str = "register";
 
     pub fn declare(declaration: &Declaration) -> Result<Self, venial::Error> {
@@ -14,7 +14,7 @@ impl RonSaverLoaderAttributes {
 
         let obj = declaration
             .as_struct()
-            .ok_or_else(|| venial::Error::new("Only struct!"))?;
+            .ok_or_else(|| venial::Error::new("Only struct can be registered!"))?;
 
         for attr in obj.attributes.iter() {
             let path = &attr.path;
@@ -25,7 +25,7 @@ impl RonSaverLoaderAttributes {
         }
 
         if registers.is_empty() {
-            return Err(venial::Error::new("Didn't find any `register`"));
+            return Err(venial::Error::new("Didn't find any `register` tag"));
         }
 
         Ok(Self { registers })

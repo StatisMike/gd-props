@@ -2,10 +2,10 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use venial::Declaration;
 
-use crate::utils::RonSaverLoaderAttributes;
+use crate::utils::SaverLoaderAttributes;
 
 pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error> {
-    let RonSaverLoaderAttributes { registers } = RonSaverLoaderAttributes::declare(&decl)?;
+    let SaverLoaderAttributes { registers } = SaverLoaderAttributes::declare(&decl)?;
 
     let struct_data = decl
         .as_struct()
@@ -20,7 +20,6 @@ pub fn derive_ron_saver(decl: Declaration) -> Result<TokenStream, venial::Error>
           let class = resource.get_class();
           #(
             if class.eq(&godot::builtin::GodotString::from(stringify!(#registers))) {
-              println!("Saving!");
                 return resource.cast::<#registers>().bind().save_ron(path);
             }
           )*
