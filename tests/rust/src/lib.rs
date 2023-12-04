@@ -1,0 +1,41 @@
+use godot::{
+    builtin::GString,
+    engine::DirAccess,
+    init::{gdextension, ExtensionLibrary, InitLevel},
+};
+
+mod bench;
+mod itest;
+mod structs;
+
+fn remove_file(path: impl Into<GString>, file_name: impl Into<GString>) {
+    let gd_path = path.into();
+    let gd_file = file_name.into();
+
+    let mut da = DirAccess::open(gd_path).unwrap();
+    if da.file_exists(gd_file.clone()) {
+        da.remove(gd_file);
+    }
+}
+
+struct GodotIoTests;
+pub use godot_test::GdTestRunner;
+use structs::prop_handlers::{PropLoader, PropSaver};
+
+// use crate::structs::{resource::TestResource, singleton::GodotSingleton};
+
+#[gdextension(entry_point=tests_init)]
+unsafe impl ExtensionLibrary for GodotIoTests {
+    fn on_level_init(init: InitLevel) {
+        if init == InitLevel::Scene {
+            use godot_io::traits::GdResLoader as _;
+            use godot_io::traits::GdResSaver as _;
+            PropSaver::register_saver();
+            PropLoader::register_loader();
+            // _ = TestResource::singleton();
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests;

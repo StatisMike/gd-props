@@ -7,7 +7,7 @@ pub(crate) struct SaverLoaderAttributes {
 }
 
 impl SaverLoaderAttributes {
-    const REGISTER_PATH: &str = "register";
+    const REGISTER_PATH: &'static str = "register";
 
     pub fn declare(declaration: &Declaration) -> Result<Self, venial::Error> {
         let mut registers = Vec::new();

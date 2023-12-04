@@ -1,0 +1,407 @@
+(gd_class:"TestResource",uid:"uid://ifijn3rlixie")
+(
+    set: [
+        (
+            int: 69,
+            character: 'E',
+        ),
+        (
+            int: -195,
+            character: 'K',
+        ),
+        (
+            int: -175,
+            character: 'G',
+        ),
+        (
+            int: -212,
+            character: 'V',
+        ),
+        (
+            int: -201,
+            character: 'P',
+        ),
+        (
+            int: -33,
+            character: 'Z',
+        ),
+        (
+            int: 120,
+            character: 'Y',
+        ),
+        (
+            int: 59,
+            character: 'A',
+        ),
+        (
+            int: 110,
+            character: 'M',
+        ),
+        (
+            int: -253,
+            character: 'Z',
+        ),
+        (
+            int: 119,
+            character: 'D',
+        ),
+        (
+            int: 115,
+            character: 'U',
+        ),
+        (
+            int: -207,
+            character: 'D',
+        ),
+        (
+            int: 73,
+            character: 'C',
+        ),
+        (
+            int: 141,
+            character: 'O',
+        ),
+        (
+            int: 149,
+            character: 'O',
+        ),
+        (
+            int: -144,
+            character: 'J',
+        ),
+        (
+            int: -146,
+            character: 'U',
+        ),
+        (
+            int: 138,
+            character: 'G',
+        ),
+        (
+            int: -117,
+            character: 'R',
+        ),
+        (
+            int: -248,
+            character: 'F',
+        ),
+        (
+            int: -29,
+            character: 'P',
+        ),
+        (
+            int: 20,
+            character: 'J',
+        ),
+        (
+            int: 51,
+            character: 'F',
+        ),
+        (
+            int: -74,
+            character: 'G',
+        ),
+        (
+            int: -79,
+            character: 'W',
+        ),
+        (
+            int: -60,
+            character: 'J',
+        ),
+        (
+            int: 24,
+            character: 'C',
+        ),
+        (
+            int: 173,
+            character: 'R',
+        ),
+        (
+            int: -61,
+            character: 'Y',
+        ),
+        (
+            int: 70,
+            character: 'A',
+        ),
+        (
+            int: 57,
+            character: 'N',
+        ),
+        (
+            int: -207,
+            character: 'Y',
+        ),
+        (
+            int: -45,
+            character: 'M',
+        ),
+        (
+            int: -123,
+            character: 'X',
+        ),
+        (
+            int: -253,
+            character: 'Y',
+        ),
+        (
+            int: 176,
+            character: 'G',
+        ),
+        (
+            int: -94,
+            character: 'D',
+        ),
+        (
+            int: 169,
+            character: 'V',
+        ),
+        (
+            int: -160,
+            character: 'R',
+        ),
+        (
+            int: -45,
+            character: 'I',
+        ),
+        (
+            int: -189,
+            character: 'F',
+        ),
+        (
+            int: 234,
+            character: 'S',
+        ),
+        (
+            int: 39,
+            character: 'S',
+        ),
+        (
+            int: 109,
+            character: 'S',
+        ),
+        (
+            int: 254,
+            character: 'A',
+        ),
+        (
+            int: 23,
+            character: 'L',
+        ),
+        (
+            int: -222,
+            character: 'Y',
+        ),
+        (
+            int: -250,
+            character: 'L',
+        ),
+        (
+            int: -90,
+            character: 'R',
+        ),
+    ],
+    vec: [
+        (
+            int: 194,
+            character: 'N',
+        ),
+        (
+            int: 85,
+            character: 'P',
+        ),
+        (
+            int: 39,
+            character: 'R',
+        ),
+        (
+            int: -95,
+            character: 'D',
+        ),
+        (
+            int: -221,
+            character: 'J',
+        ),
+        (
+            int: 75,
+            character: 'C',
+        ),
+        (
+            int: 169,
+            character: 'R',
+        ),
+        (
+            int: -108,
+            character: 'B',
+        ),
+        (
+            int: 236,
+            character: 'R',
+        ),
+        (
+            int: 89,
+            character: 'F',
+        ),
+        (
+            int: -187,
+            character: 'T',
+        ),
+        (
+            int: 46,
+            character: 'L',
+        ),
+        (
+            int: 133,
+            character: 'R',
+        ),
+        (
+            int: 73,
+            character: 'H',
+        ),
+        (
+            int: -92,
+            character: 'A',
+        ),
+        (
+            int: -229,
+            character: 'U',
+        ),
+        (
+            int: 139,
+            character: 'N',
+        ),
+        (
+            int: 204,
+            character: 'Z',
+        ),
+        (
+            int: -150,
+            character: 'M',
+        ),
+        (
+            int: 90,
+            character: 'X',
+        ),
+        (
+            int: 241,
+            character: 'B',
+        ),
+        (
+            int: -73,
+            character: 'Y',
+        ),
+        (
+            int: -43,
+            character: 'G',
+        ),
+        (
+            int: 172,
+            character: 'S',
+        ),
+        (
+            int: -225,
+            character: 'H',
+        ),
+        (
+            int: -54,
+            character: 'F',
+        ),
+        (
+            int: -204,
+            character: 'T',
+        ),
+        (
+            int: 204,
+            character: 'P',
+        ),
+        (
+            int: 22,
+            character: 'A',
+        ),
+        (
+            int: 205,
+            character: 'F',
+        ),
+        (
+            int: 205,
+            character: 'K',
+        ),
+        (
+            int: -46,
+            character: 'U',
+        ),
+        (
+            int: -104,
+            character: 'G',
+        ),
+        (
+            int: 153,
+            character: 'Q',
+        ),
+        (
+            int: 28,
+            character: 'D',
+        ),
+        (
+            int: -116,
+            character: 'C',
+        ),
+        (
+            int: 116,
+            character: 'B',
+        ),
+        (
+            int: -11,
+            character: 'F',
+        ),
+        (
+            int: -176,
+            character: 'A',
+        ),
+        (
+            int: -201,
+            character: 'T',
+        ),
+        (
+            int: -76,
+            character: 'T',
+        ),
+        (
+            int: 8,
+            character: 'N',
+        ),
+        (
+            int: 186,
+            character: 'C',
+        ),
+        (
+            int: 47,
+            character: 'Q',
+        ),
+        (
+            int: 156,
+            character: 'K',
+        ),
+        (
+            int: -16,
+            character: 'X',
+        ),
+        (
+            int: -163,
+            character: 'P',
+        ),
+        (
+            int: -245,
+            character: 'U',
+        ),
+        (
+            int: -146,
+            character: 'U',
+        ),
+        (
+            int: 10,
+            character: 'P',
+        ),
+    ],
+)

@@ -5,5 +5,10 @@ members = [
   "godot_io_defs",
   "godot_io_derive",
 
-  "tests"
+  # tests
+  "tests/rust"
+
+  # TODO: example
+  # "examples/save_game/rust",
+
 ]

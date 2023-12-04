@@ -1,0 +1,38 @@
+(
+    set: [
+        (
+            int: 55,
+            character: 'D',
+        ),
+        (
+            int: -30,
+            character: 'Y',
+        ),
+        (
+            int: -125,
+            character: 'N',
+        ),
+        (
+            int: 235,
+            character: 'A',
+        ),
+    ],
+    vec: [
+        (
+            int: -173,
+            character: 'K',
+        ),
+        (
+            int: -246,
+            character: 'U',
+        ),
+        (
+            int: -205,
+            character: 'W',
+        ),
+        (
+            int: -68,
+            character: 'A',
+        ),
+    ],
+)

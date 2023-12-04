@@ -1,12 +1,19 @@
 [package]
 name = "tests"
-version = "0.2.2"
+version = "0.1.0"
 edition = "2021"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dev-dependencies]
-godot_io = {path = "../godot_io"}
-once_cell = "^1.18.0"
+[dependencies]
+godot_io = {path = "../../godot_io"}
+godot-test = { git = "https://github.com/StatisMike/godot-test", branch = "master" }
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 serde = { version = "^1", features = ["derive"] }
+rand = "0.8.5"
+ron = "0.8.1"
+rmp-serde = "1.1.2"
