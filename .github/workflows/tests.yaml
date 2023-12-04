@@ -22,8 +22,8 @@ jobs:
       - name: Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
-      # - name: Run Rust tests
-      #   run: cargo test
+      - name: Run Rust tests
+        run: cargo test
 
       - name: Download Godot
         shell: bash
@@ -37,4 +37,4 @@ jobs:
         
       - name: Run Godot integration tests
         shell: bash
-        run: ./$GODOT_BINARY --path tests/godot --headless 
+        run: ./$GODOT_BINARY --path tests/godot --headless

@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 godot_io = {path = "../../godot_io"}
-godot-test = { git = "https://github.com/StatisMike/godot-test", branch = "master" }
+gd-rehearse = { git = "https://github.com/StatisMike/gd-rehearse", branch = "master" }
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 serde = { version = "^1", features = ["derive"] }
 rand = "0.8.5"

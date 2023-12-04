@@ -4,7 +4,7 @@ use godot::{
     obj::UserClass,
 };
 use godot_io::traits::{GdResLoader, GdResSaver};
-use godot_test::itest::gditest;
+use gd_rehearse::itest::gditest;
 
 use crate::structs::{
     prop_handlers::{PropLoader, PropSaver},

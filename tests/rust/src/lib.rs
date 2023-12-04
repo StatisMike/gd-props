@@ -19,7 +19,7 @@ fn remove_file(path: impl Into<GString>, file_name: impl Into<GString>) {
 }
 
 struct GodotIoTests;
-pub use godot_test::GdTestRunner;
+pub use gd_rehearse::GdTestRunner;
 use structs::prop_handlers::{PropLoader, PropSaver};
 
 // use crate::structs::{resource::TestResource, singleton::GodotSingleton};
