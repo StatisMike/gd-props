@@ -40,7 +40,7 @@ where
 // }
 
 /// Module that can be used to serialize and deserialize objects castable
-/// to [Resouce](godot::engine::Resource) on basis of their [Gd](godot::obj::Gd).
+/// to [Resouce](godot::engine::Resource) on basis of their [Gd].
 ///
 /// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on
 /// resources containing pointers to other resources, while
@@ -100,7 +100,7 @@ pub mod gd {
 }
 
 /// Module that can be used to serialize and deserialize objects castable
-/// to [Resouce](godot::engine::Resource) on basis of their [Option]<[Gd](godot::obj::Gd)>.
+/// to [Resouce](godot::engine::Resource) on basis of their [Option]<[Gd]>.
 ///
 /// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on
 /// resources containing optional pointers to other resources, while
@@ -211,7 +211,7 @@ pub mod gd_vec {
 }
 
 /// Module that can be used to serialize and deserialize External Resources
-/// kept within your custom [Resource](godot::engine::Resource).  
+/// kept within your custom [Resource].  
 ///
 /// External Resource which [Gd] is contained within the annotated field don't need
 /// to implement [serde::Serialize] and [serde::Deserialize] - no regular
@@ -221,7 +221,7 @@ pub mod gd_vec {
 /// on its basis.
 ///
 /// The External Resource can be both godot built-in resource and other rust-defined
-/// custom [Resource](godot::engine::Resource).
+/// custom [Resource].
 ///
 /// ## Example
 ///
@@ -290,7 +290,7 @@ pub mod ext {
 }
 
 /// Module that can be used to serialize and deserialize optional External Resources
-/// kept within your custom [Resource](godot::engine::Resource).  
+/// kept within your custom [Resource].  
 ///
 /// External Resource which [Option]<[Gd]> is contained within the annotated field don't need
 /// to implement [serde::Serialize] and [serde::Deserialize] - no regular
@@ -300,7 +300,7 @@ pub mod ext {
 /// on basis of this data.
 ///
 /// The External Resource can be both godot built-in resource and other rust-defined
-/// custom [Resource](godot::engine::Resource).
+/// custom [Resource].
 ///
 /// ## Example
 ///
