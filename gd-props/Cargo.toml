@@ -9,8 +9,6 @@ edition = "2021"
 gd-props-macros = { path = "../gd-props-macros" }
 gd-props-defs = { path = "../gd-props-defs" }
 godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
-
-[dev-dependencies]
 serde = { version = "^1", features = ["derive"] }
 ron = "0.8.1"
 rmp-serde = "1.1.2"
