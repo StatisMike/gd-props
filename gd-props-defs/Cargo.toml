@@ -1,5 +1,5 @@
 [package]
-name = "godot_io_defs"
+name = "gd-props-defs"
 version = "0.1.0"
 edition = "2021"
 
@@ -12,4 +12,4 @@ godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
 rmp-serde = "1.1.2"
 
 [dev-dependencies]
-godot_io = { path = "../godot_io" }
+gd-props = { path = "../gd-props" }

@@ -3,7 +3,7 @@ use godot::{
     engine::{ResourceLoader, ResourceSaver},
     obj::UserClass,
 };
-use godot_io::traits::{GdResLoader, GdResSaver};
+use gd_props::traits::{GdPropLoader, GdPropSaver};
 use gd_rehearse::itest::gditest;
 
 use crate::structs::{

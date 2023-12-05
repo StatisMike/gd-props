@@ -1,7 +1,7 @@
+use gd_rehearse::bench::gdbench;
 use godot::builtin::GString;
 use godot::engine::{IResourceFormatLoader, IResourceFormatSaver};
 use godot::obj::{Gd, UserClass};
-use gd_rehearse::bench::gdbench;
 use serde::{Deserialize, Serialize};
 
 use crate::remove_file;
@@ -11,7 +11,7 @@ use crate::structs::{prop_handlers::PropSaver, resource::TestResource};
 
 #[gdbench(repeat = 10)]
 fn serialize() -> bool {
-    let res = TestResource::new_random(4,4);
+    let res = TestResource::new_random(4, 4);
 
     let mut buffer = Vec::new();
 
@@ -41,7 +41,7 @@ fn gdron_save() -> bool {
 
     let mut saver = PropSaver::new_gd();
 
-    let resource = TestResource::new_random(50,50);
+    let resource = TestResource::new_random(50, 50);
 
     saver
         .bind_mut()

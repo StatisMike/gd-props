@@ -28,8 +28,8 @@ use structs::prop_handlers::{PropLoader, PropSaver};
 unsafe impl ExtensionLibrary for GodotIoTests {
     fn on_level_init(init: InitLevel) {
         if init == InitLevel::Scene {
-            use godot_io::traits::GdResLoader as _;
-            use godot_io::traits::GdResSaver as _;
+            use gd_props::traits::GdPropLoader as _;
+            use gd_props::traits::GdPropSaver as _;
             PropSaver::register_saver();
             PropLoader::register_loader();
             // _ = TestResource::singleton();

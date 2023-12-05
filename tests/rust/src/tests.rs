@@ -1,6 +1,6 @@
+use gd_props::{traits::*, *};
 use godot::engine::IResource;
 use godot::prelude::{godot_api, Base, Gd, GodotClass, Resource};
-use godot_io::{traits::*, *};
 use serde::{Deserialize, Serialize};
 
 #[test]
@@ -52,21 +52,21 @@ fn gd_option_can_serde() {
 
 #[test]
 fn loader_can_be_implemented() {
-    #[derive(GodotClass, Serialize, Deserialize, GdRes)]
+    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
     struct TestStruct {}
 
     #[godot_api]
     impl TestStruct {}
 
-    #[derive(GodotClass, Serialize, Deserialize, GdRes)]
+    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
     struct TestStruct2 {}
 
     #[godot_api]
     impl TestStruct2 {}
 
-    #[derive(GodotClass, GdResLoader)]
+    #[derive(GodotClass, GdPropLoader)]
     #[class(init, tool, base=ResourceFormatLoader)]
     #[register(TestStruct)]
     #[register(TestStruct2)]
@@ -77,21 +77,21 @@ fn loader_can_be_implemented() {
 
 #[test]
 fn saver_can_be_implemented() {
-    #[derive(GodotClass, Serialize, Deserialize, GdRes)]
+    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
     struct TestStruct {}
 
     #[godot_api]
     impl TestStruct {}
 
-    #[derive(GodotClass, Serialize, Deserialize, GdRes)]
+    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
     struct TestStruct2 {}
 
     #[godot_api]
     impl TestStruct2 {}
 
-    #[derive(GodotClass, GdResSaver)]
+    #[derive(GodotClass, GdPropSaver)]
     #[class(init, tool, base=ResourceFormatSaver)]
     #[register(TestStruct)]
     #[register(TestStruct2)]
@@ -102,7 +102,7 @@ fn saver_can_be_implemented() {
 
 #[test]
 fn gdres_trait_can_be_implemented() {
-    #[derive(GodotClass, Serialize, Deserialize, GdRes)]
+    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
     struct TestStruct {}
 
