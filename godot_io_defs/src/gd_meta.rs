@@ -1,6 +1,6 @@
 use godot::{
     engine::{file_access::ModeFlags, FileAccess, ResourceLoader},
-    prelude::{GodotString, Gd, Resource},
+    prelude::{GString, Gd, Resource},
 };
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +13,7 @@ pub(crate) struct GdMetaHeader {
 }
 
 impl GdMetaHeader {
-    pub fn read_from_gdron_header(path: GodotString) -> Result<Self, GdRonError> {
+    pub fn read_from_gdron_header(path: GString) -> Result<Self, GdRonError> {
         let fa = FileAccess::open(path.clone(), ModeFlags::READ);
         if fa.is_none() {
             return Err(GdRonError::OpenFileRead);
@@ -29,7 +29,7 @@ impl GdMetaHeader {
         Ok(meta.unwrap())
     }
 
-    pub fn write_to_gdron_header(&self, path: GodotString) -> Result<(), GdRonError> {
+    pub fn write_to_gdron_header(&self, path: GString) -> Result<(), GdRonError> {
         let ser_res = ron::to_string(&self);
         if ser_res.is_err() {
             return Err(GdRonError::HeaderSerialize);
@@ -42,8 +42,35 @@ impl GdMetaHeader {
         }
         let mut fa = fa.unwrap();
 
-        fa.store_line(GodotString::from(ser));
+        fa.store_line(GString::from(ser));
         Ok(())
+    }
+
+    pub fn write_to_gdbin_header(&self, path: GString) -> Result<(), GdRonError> {
+        let mut fa =
+            FileAccess::open(path, ModeFlags::READ_WRITE).ok_or(GdRonError::OpenFileWrite)?;
+
+        self.write_to_gdbin_fa(&mut fa);
+
+        Ok(())
+    }
+
+    pub fn read_from_gdbin_header(path: GString) -> Result<Self, GdRonError> {
+        let mut fa = FileAccess::open(path, ModeFlags::READ).ok_or(GdRonError::OpenFileRead)?;
+
+        Ok(Self::read_from_gdbin_fa(&mut fa))
+    }
+
+    pub fn write_to_gdbin_fa(&self, fa: &mut Gd<FileAccess>) {
+        fa.store_pascal_string(GString::from(&self.gd_class));
+        fa.store_pascal_string(GString::from(&self.uid));
+    }
+
+    pub fn read_from_gdbin_fa(fa: &mut Gd<FileAccess>) -> Self {
+        let gd_class = fa.get_pascal_string().to_string();
+        let uid = fa.get_pascal_string().to_string();
+
+        Self { gd_class, uid }
     }
 }
 
@@ -51,7 +78,7 @@ impl GdMetaHeader {
 pub(crate) struct GdMetaExt {
     pub gd_class: String,
     pub uid: String,
-    pub path: String
+    pub path: String,
 }
 
 impl GdMetaExt {
@@ -66,10 +93,10 @@ impl GdMetaExt {
         None
     }
     fn try_load_from_uid(&self, resource_loader: &mut Gd<ResourceLoader>) -> Option<Gd<Resource>> {
-        resource_loader.load(GodotString::from(&self.uid))
+        resource_loader.load(GString::from(&self.uid))
     }
     fn try_load_from_path(&self, resource_loader: &mut Gd<ResourceLoader>) -> Option<Gd<Resource>> {
-        resource_loader.load(GodotString::from(&self.path))
+        resource_loader.load(GString::from(&self.path))
     }
 }
 

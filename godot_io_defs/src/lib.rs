@@ -1,13 +1,10 @@
 pub mod errors;
 pub(crate) mod gd_meta;
-mod ron_loader;
-mod ron_resource;
-mod ron_saver;
+pub(crate) mod gdres;
+pub(crate) mod gdres_io;
 pub mod serde_gd;
-pub mod types;
 
 pub mod traits {
-    pub use super::ron_loader::GdRonLoader;
-    pub use super::ron_resource::GdRonResource;
-    pub use super::ron_saver::GdRonSaver;
+    pub use super::gdres::GdRes;
+    pub use super::gdres_io::{GdResLoader, GdResSaver};
 }

@@ -2,3 +2,5 @@ target/
 .vscode/
 .lock
 Cargo.lock
+.godot
+examples/
