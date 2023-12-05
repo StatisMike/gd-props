@@ -63,7 +63,7 @@ where
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="godot_io::serde_gd::gd")]
+///     #[serde(with="gd_props::serde_gd::gd")]
 ///     inner: Gd<InnerResource>
 /// }
 ///
@@ -123,7 +123,7 @@ pub mod gd {
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(init, base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="godot_io::serde_gd::gd_option")]
+///     #[serde(with="gd_props::serde_gd::gd_option")]
 ///     #[export]
 ///     inner: Option<Gd<InnerResource>>
 /// }
@@ -240,7 +240,7 @@ pub mod gd_vec {
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(init, base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="godot_io::serde_gd::ext")]
+///     #[serde(with="gd_props::serde_gd::ext")]
 ///     inner: Gd<InnerResource>
 /// }
 ///
@@ -319,7 +319,7 @@ pub mod ext {
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(init, base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="godot_io::serde_gd::ext_option")]
+///     #[serde(with="gd_props::serde_gd::ext_option")]
 ///     #[export]
 ///     inner: Option<Gd<InnerResource>>
 /// }
@@ -363,6 +363,7 @@ pub mod ext_option {
     }
 }
 
+#[doc(hidden)]
 pub mod ext_vec {
 
     use crate::gd_meta::{GdExtResource, GdMetaExt};

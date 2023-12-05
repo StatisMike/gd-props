@@ -4,7 +4,7 @@ use godot::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::errors::GdRonError;
+use crate::errors::GdPropError;
 
 #[derive(Serialize, Deserialize)]
 pub(crate) struct GdMetaHeader {
@@ -13,10 +13,10 @@ pub(crate) struct GdMetaHeader {
 }
 
 impl GdMetaHeader {
-    pub fn read_from_gdron_header(path: GString) -> Result<Self, GdRonError> {
+    pub fn read_from_gdron_header(path: GString) -> Result<Self, GdPropError> {
         let fa = FileAccess::open(path.clone(), ModeFlags::READ);
         if fa.is_none() {
-            return Err(GdRonError::OpenFileRead);
+            return Err(GdPropError::OpenFileRead);
         }
         let mut fa = fa.unwrap();
         let line = fa.get_line().to_string();
@@ -24,21 +24,21 @@ impl GdMetaHeader {
         let meta = ron::from_str::<GdMetaHeader>(&line);
 
         if let Err(error) = meta {
-            return Err(GdRonError::HeaderDeserialize(error));
+            return Err(GdPropError::HeaderDeserialize(error));
         }
         Ok(meta.unwrap())
     }
 
-    pub fn write_to_gdron_header(&self, path: GString) -> Result<(), GdRonError> {
+    pub fn write_to_gdron_header(&self, path: GString) -> Result<(), GdPropError> {
         let ser_res = ron::to_string(&self);
         if ser_res.is_err() {
-            return Err(GdRonError::HeaderSerialize);
+            return Err(GdPropError::HeaderSerialize);
         }
         let ser = ser_res.unwrap();
 
         let fa = FileAccess::open(path, ModeFlags::READ_WRITE);
         if fa.is_none() {
-            return Err(GdRonError::OpenFileWrite);
+            return Err(GdPropError::OpenFileWrite);
         }
         let mut fa = fa.unwrap();
 
@@ -46,17 +46,17 @@ impl GdMetaHeader {
         Ok(())
     }
 
-    pub fn write_to_gdbin_header(&self, path: GString) -> Result<(), GdRonError> {
+    pub fn write_to_gdbin_header(&self, path: GString) -> Result<(), GdPropError> {
         let mut fa =
-            FileAccess::open(path, ModeFlags::READ_WRITE).ok_or(GdRonError::OpenFileWrite)?;
+            FileAccess::open(path, ModeFlags::READ_WRITE).ok_or(GdPropError::OpenFileWrite)?;
 
         self.write_to_gdbin_fa(&mut fa);
 
         Ok(())
     }
 
-    pub fn read_from_gdbin_header(path: GString) -> Result<Self, GdRonError> {
-        let mut fa = FileAccess::open(path, ModeFlags::READ).ok_or(GdRonError::OpenFileRead)?;
+    pub fn read_from_gdbin_header(path: GString) -> Result<Self, GdPropError> {
+        let mut fa = FileAccess::open(path, ModeFlags::READ).ok_or(GdPropError::OpenFileRead)?;
 
         Ok(Self::read_from_gdbin_fa(&mut fa))
     }

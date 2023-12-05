@@ -15,12 +15,12 @@ pub fn derive_saver(decl: Declaration) -> Result<TokenStream, venial::Error> {
     Ok(quote!(
 
       use ::godot::engine::IResourceFormatSaver as _;
-      use ::godot_io::traits::GdResSaver as _;
+      use ::gd_props::traits::GdPropSaver as _;
 
       #[godot::prelude::godot_api]
       impl ::godot::engine::IResourceFormatSaver for #struct_ident {
         fn save(&mut self, resource: godot::obj::Gd<godot::engine::Resource>, path: godot::builtin::GString, _flags: u32) -> godot::engine::global::Error {
-          use ::godot_io::traits::GdRes;
+          use ::gd_props::traits::GdProp;
           let class = resource.get_class();
           #(
             if class.eq(&::godot::builtin::GString::from(stringify!(#registers))) {
@@ -49,7 +49,7 @@ pub fn derive_saver(decl: Declaration) -> Result<TokenStream, venial::Error> {
         }
       }
 
-      impl ::godot_io::traits::GdResSaver for #struct_ident {
+      impl ::gd_props::traits::GdPropSaver for #struct_ident {
         const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
       }
     ))
@@ -66,7 +66,7 @@ pub fn derive_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
     Ok(quote!(
 
       use ::godot::engine::IResourceFormatLoader as _;
-      use ::godot_io::traits::GdResLoader as _;
+      use ::gd_props::traits::GdPropLoader as _;
 
       #[godot::prelude::godot_api]
       impl ::godot::engine::IResourceFormatLoader for #struct_ident {
@@ -85,7 +85,7 @@ pub fn derive_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
         }
 
         fn get_resource_type(&self, path: godot::builtin::GString) -> godot::builtin::GString {
-          use ::godot_io::traits::GdRes;
+          use ::gd_props::traits::GdProp;
           if let Ok(struct_name) = self._int_get_type(path) {
             #(
               if struct_name.eq(#registers::HEAD_IDENT) {
@@ -97,7 +97,7 @@ pub fn derive_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
         }
 
         fn load(&self, path: ::godot::builtin::GString, _original_path: godot::builtin::GString, _use_sub_threads: bool, _cache_mode: i32) -> godot::builtin::Variant {
-          use ::godot_io::traits::GdRes;
+          use ::gd_props::traits::GdProp;
 
           match self._int_get_type(path.clone()) {
             Err(error) => ::godot::prelude::godot_error!("Error getting '{}' resource type during load: {}", path, error),
@@ -123,7 +123,7 @@ pub fn derive_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
         }
       }
 
-      impl ::godot_io::traits::GdResLoader for #struct_ident {
+      impl ::gd_props::traits::GdPropLoader for #struct_ident {
         const SINGLETON_NAME: &'static str = stringify!(#struct_ident);
       }
     ))
@@ -137,7 +137,7 @@ pub fn derive_resource(decl: Declaration) -> Result<TokenStream, venial::Error> 
     let name = &item.name;
 
     Ok(quote!(
-      impl ::godot_io::traits::GdRes for #name {
+      impl ::gd_props::traits::GdProp for #name {
         const HEAD_IDENT: &'static str = stringify!(#name);
       }
     ))

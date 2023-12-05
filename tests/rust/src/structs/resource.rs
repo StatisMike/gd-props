@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 
+use gd_props::GdProp;
 use godot::{
     obj::Gd,
     prelude::{godot_api, GodotClass},
 };
-use godot_io::GdRes;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
@@ -25,7 +25,7 @@ impl InnerThing {
     }
 }
 
-#[derive(GodotClass, Serialize, Deserialize, GdRes)]
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(init,base=Resource)]
 pub struct TestResource {
     set: HashSet<InnerThing>,

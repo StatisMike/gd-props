@@ -1,13 +1,13 @@
 use super::resource::TestResource;
+use gd_props::{GdPropLoader, GdPropSaver};
 use godot::bind::GodotClass;
-use godot_io::{GdResLoader, GdResSaver};
 
-#[derive(GodotClass, GdResSaver)]
+#[derive(GodotClass, GdPropSaver)]
 #[class(init, base = ResourceFormatSaver, tool)]
 #[register(TestResource)]
 pub struct PropSaver;
 
-#[derive(GodotClass, GdResLoader)]
+#[derive(GodotClass, GdPropLoader)]
 #[class(init, base = ResourceFormatLoader, tool)]
 #[register(TestResource)]
 pub struct PropLoader;

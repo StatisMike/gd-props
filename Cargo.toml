@@ -1,9 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
-  "godot_io",
-  "godot_io_defs",
-  "godot_io_derive",
+  "gd-props",
+  "gd-props-defs",
+  "gd-props-macros",
 
   # tests
   "tests/rust"
