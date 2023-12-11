@@ -1,15 +1,18 @@
-use godot::{
-    builtin::GString,
-    engine::{ResourceLoader, ResourceSaver},
-    obj::UserClass,
-};
 use gd_props::traits::{GdPropLoader, GdPropSaver};
 use gd_rehearse::itest::gditest;
+use godot::{
+    builtin::GString,
+    engine::{load, try_load, DirAccess, ResourceLoader, ResourceSaver},
+    obj::UserClass,
+};
 
 use crate::structs::{
     prop_handlers::{PropLoader, PropSaver},
     resource::TestResource,
 };
+
+const RES_PATH: &str = "res://";
+const RES_NAME: &str = "test_main_saver_loader.gdbin";
 
 #[gditest]
 fn gd_saver_register() {
@@ -60,4 +63,43 @@ fn gd_loader_register() {
             .as_slice()
             .contains(&GString::from(extension)));
     }
+}
+
+#[gditest]
+fn save_and_load_global() {
+    let resource = TestResource::new_random(5, 3);
+    let mut da = DirAccess::open(RES_PATH.into()).unwrap();
+
+    // Save resource.
+    let mut resource_saver = ResourceSaver::singleton();
+
+    let save_res = resource_saver
+        .save_ex(resource.clone().upcast())
+        .path(format!("{}{}", RES_PATH, RES_NAME).into())
+        .done();
+
+    assert_eq!(save_res, godot::engine::global::Error::OK);
+
+    assert!(da.file_exists(RES_NAME.into()));
+
+    // Load resource.
+
+    let load_res = try_load::<TestResource>(format!("{}{}", RES_PATH, RES_NAME));
+    assert!(load_res.is_some());
+
+    let loaded = load_res.unwrap();
+    let second = load::<TestResource>(format!("{}{}", RES_PATH, RES_NAME));
+
+    assert!(TestResource::check_set_eq(
+        resource.bind().get_set(),
+        loaded.bind().get_set()
+    ));
+    assert!(TestResource::check_vec_eq(
+        resource.bind().get_vec(),
+        loaded.bind().get_vec()
+    ));
+
+    assert_eq!(loaded.instance_id(), second.instance_id());
+
+    da.remove(format!("{}{}", RES_PATH, RES_NAME).into());
 }

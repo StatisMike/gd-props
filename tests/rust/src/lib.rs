@@ -1,8 +1,4 @@
-use godot::{
-    builtin::GString,
-    engine::DirAccess,
-    init::{gdextension, ExtensionLibrary, InitLevel},
-};
+use godot::{builtin::GString, engine::DirAccess, init::*};
 
 mod bench;
 mod itest;
