@@ -1,16 +1,19 @@
-use godot::{
-    engine::{
-        global::Error, Engine, IResourceFormatLoader, IResourceFormatSaver, RefCounted,
-        ResourceFormatLoader, ResourceFormatSaver, ResourceUid,
-    },
-    obj::{cap::GodotDefault, dom::UserDomain, mem::StaticRefCount},
-    prelude::{
-        godot_error, godot_warn, GString, Gd, GodotClass, Inherits, Object, PackedStringArray,
-        ToGodot, Variant,
-    },
+use godot::builtin::meta::ToGodot;
+use godot::builtin::{GString, PackedStringArray, Variant};
+use godot::engine::global::Error;
+use godot::engine::{
+    Engine, IResourceFormatLoader, IResourceFormatSaver, Object, RefCounted, ResourceFormatLoader,
+    ResourceFormatSaver, ResourceUid,
 };
+use godot::log::{godot_error, godot_warn};
+use godot::obj::cap::GodotDefault;
+use godot::obj::dom::UserDomain;
+use godot::obj::mem::StaticRefCount;
+use godot::obj::{Gd, GodotClass, Inherits};
 
-use crate::{errors::GdPropError, gd_meta::GdMetaHeader, gdprop::GdProp};
+use crate::errors::GdPropError;
+use crate::gd_meta::GdMetaHeader;
+use crate::gdprop::GdProp;
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub(crate) enum GdPropFormat {

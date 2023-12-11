@@ -1,7 +1,10 @@
-use godot::{
-    engine::{file_access::ModeFlags, FileAccess, ResourceLoader},
-    prelude::{GString, Gd, Resource},
-};
+use std::io::BufRead;
+
+use godot::builtin::GString;
+use godot::engine::file_access::ModeFlags;
+use godot::engine::{FileAccess, GFile, Resource, ResourceLoader};
+use godot::obj::Gd;
+
 use serde::{Deserialize, Serialize};
 
 use crate::errors::GdPropError;
@@ -71,6 +74,31 @@ impl GdMetaHeader {
         let uid = fa.get_pascal_string().to_string();
 
         Self { gd_class, uid }
+    }
+
+    pub fn from_gfile_ron(gfile: &mut GFile) -> Result<Self, GdPropError> {
+        let mut serialized = String::new();
+        let res = gfile.read_line(&mut serialized);
+        if let Err(error) = res {
+            return Err(GdPropError::FileRead(error));
+        }
+        match ron::from_str::<Self>(&serialized) {
+            Ok(header) => Ok(header),
+            Err(error) => Err(GdPropError::HeaderDeserialize(error)),
+        }
+    }
+
+    pub fn to_gfile_ron(&self, gfile: &mut GFile) -> Result<(), GdPropError> {
+        match ron::to_string(self) {
+            Ok(serialized) => {
+                let res = gfile.write_gstring_line(&serialized);
+                if let Err(error) = res {
+                    return Err(GdPropError::FileWrite(error));
+                }
+                Ok(())
+            }
+            Err(_) => Err(GdPropError::HeaderSerialize),
+        }
     }
 }
 
