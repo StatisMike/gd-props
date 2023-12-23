@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"gd_props_defs":[["impl Freeze for <a class=\"enum\" href=\"gd_props_defs/errors/enum.GdPropError.html\" title=\"enum gd_props_defs::errors::GdPropError\">GdPropError</a>",1,["gd_props_defs::errors::GdPropError"]],["impl&lt;T&gt; Freeze for <a class=\"struct\" href=\"gd_props_defs/types/struct.GdResVec.html\" title=\"struct gd_props_defs::types::GdResVec\">GdResVec</a>&lt;T&gt;",1,["gd_props_defs::types::GdResVec"]]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

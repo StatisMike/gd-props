@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"gd_props_defs":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.74.1/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a> for <a class=\"enum\" href=\"gd_props_defs/errors/enum.GdPropError.html\" title=\"enum gd_props_defs::errors::GdPropError\">GdPropError</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

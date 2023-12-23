@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"trait":["GdProp","GdPropLoader","GdPropSaver"]};

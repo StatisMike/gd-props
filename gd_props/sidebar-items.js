@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"derive":["GdProp","GdPropLoader","GdPropSaver"],"mod":["errors","serde_gd","traits","types"]};

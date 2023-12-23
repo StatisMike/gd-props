@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"gd_props_defs":[["impl&lt;T&gt; FromGodot for <a class=\"struct\" href=\"gd_props_defs/types/struct.GdResVec.html\" title=\"struct gd_props_defs::types::GdResVec\">GdResVec</a>&lt;T&gt;<span class=\"where fmt-newline\">where\n    T: Inherits&lt;Resource&gt;,</span>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
