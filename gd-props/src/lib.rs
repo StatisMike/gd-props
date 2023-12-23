@@ -33,3 +33,4 @@ pub mod traits {
 
 pub use gd_props_defs::errors;
 pub use gd_props_defs::serde_gd;
+pub use gd_props_defs::types;
