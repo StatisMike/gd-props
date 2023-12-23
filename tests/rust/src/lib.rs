@@ -16,6 +16,7 @@ fn remove_file(path: impl Into<GString>, file_name: impl Into<GString>) {
 
 struct GodotIoTests;
 pub use gd_rehearse::GdTestRunner;
+use rand::Rng;
 use structs::prop_handlers::{PropLoader, PropSaver};
 
 // use crate::structs::{resource::TestResource, singleton::GodotSingleton};
@@ -35,3 +36,9 @@ unsafe impl ExtensionLibrary for GodotIoTests {
 
 #[cfg(test)]
 mod tests;
+
+pub fn random_string(rng: &mut impl Rng, len: usize) -> String {
+    (0..len)
+        .map(|_| rng.gen_range(b'A'..=b'Z') as char)
+        .collect::<String>()
+}

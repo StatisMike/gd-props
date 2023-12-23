@@ -1,15 +1,11 @@
 use gd_props::traits::{GdPropLoader, GdPropSaver};
 use gd_rehearse::itest::gditest;
-use godot::{
-    builtin::GString,
-    engine::{load, try_load, DirAccess, ResourceLoader, ResourceSaver},
-    obj::UserClass,
-};
+use godot::builtin::GString;
+use godot::engine::{load, try_load, DirAccess, ResourceLoader, ResourceSaver};
+use godot::obj::UserClass;
 
-use crate::structs::{
-    prop_handlers::{PropLoader, PropSaver},
-    resource::TestResource,
-};
+use crate::structs::prop_handlers::{PropLoader, PropSaver};
+use crate::structs::resource::TestResource;
 
 const RES_PATH: &str = "res://";
 const RES_NAME: &str = "test_main_saver_loader.gdbin";

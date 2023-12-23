@@ -100,7 +100,7 @@ pub fn derive_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
           use ::gd_props::traits::GdProp;
 
           match self._int_get_type(path.clone()) {
-            Err(error) => ::godot::prelude::godot_error!("Error getting '{}' resource type during load: {}", path, error),
+            Err(error) => ::godot::prelude::godot_error!("error getting '{}' resource type during load: {}", path, error),
             Ok(struct_name) => {
               #(
                 if struct_name.eq(#registers::HEAD_IDENT) {
@@ -115,10 +115,7 @@ pub fn derive_loader(decl: Declaration) -> Result<TokenStream, venial::Error> {
         fn get_resource_uid(&self, path: ::godot::builtin::GString) -> i64 {
           match self._int_get_uid(path.clone()) {
             Ok(uid) => uid,
-            Err(error) => {
-              ::godot::prelude::godot_error!("Error getting uid from resource: '{}', '{}", path, error);
-              -1
-            }
+            Err(error) => -1
           }
         }
       }

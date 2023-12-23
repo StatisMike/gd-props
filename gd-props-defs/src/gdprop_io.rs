@@ -171,7 +171,7 @@ where
             GdPropFormat::GdRon => T::load_ron(path),
             GdPropFormat::GdBin => T::load_bin(path),
             GdPropFormat::None => {
-                godot_warn!("Unrecognized format for: {}", &path);
+                godot_warn!("unrecognized format for: {}", &path);
                 godot::engine::global::Error::ERR_FILE_UNRECOGNIZED.to_variant()
             }
         }

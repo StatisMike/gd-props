@@ -1,12 +1,17 @@
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 use gd_props::GdProp;
-use godot::{
-    obj::Gd,
-    prelude::{godot_api, GodotClass},
-};
+
+use gd_props::types::GdResVec;
+use godot::builtin::GString;
+use godot::engine::{IResource, ResourceSaver};
+use godot::obj::Gd;
+use godot::prelude::{godot_api, GodotClass};
+
 use rand::Rng;
 use serde::{Deserialize, Serialize};
+
+use crate::random_string;
 
 use super::singleton::GodotSingleton;
 
@@ -92,4 +97,129 @@ impl GodotSingleton for TestResource {
     fn singleton_instance() -> Gd<Self> {
         Self::new_random(50, 50)
     }
+}
+
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
+#[class(base=Resource)]
+pub(crate) struct WithBundledGd {
+    #[export]
+    #[serde(with = "gd_props::serde_gd::gd")]
+    pub first: Gd<TestResource>,
+    #[export]
+    #[serde(with = "gd_props::serde_gd::gd_option")]
+    pub second: Option<Gd<TestResource>>,
+}
+
+impl WithBundledGd {
+    pub(crate) fn new() -> Self {
+        Self {
+            first: TestResource::new_random(3, 4),
+            second: Some(TestResource::new_random(5, 2)),
+        }
+    }
+}
+
+#[godot_api]
+impl IResource for WithBundledGd {
+    fn init(_base: godot::obj::Base<Self::Base>) -> Self {
+        Self::new()
+    }
+}
+
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
+#[class(base=Resource, init)]
+pub(crate) struct WithBundleHashMap {
+    #[serde(with = "gd_props::serde_gd::gd_hashmap")]
+    pub map: HashMap<i32, Gd<TestResource>>,
+}
+
+impl WithBundleHashMap {
+    pub fn new(res_n: usize) -> Self {
+        let mut map = HashMap::new();
+        let mut rng = rand::thread_rng();
+        let mut set = HashSet::new();
+        for _ in 0..res_n {
+            set.insert(rng.gen_range(-256..=256));
+        }
+        for key in set {
+            let vec_n = rng.gen_range(1..10);
+            let set_n = rng.gen_range(1..10);
+            let res = TestResource::new_random(set_n, vec_n);
+            map.insert(key, res);
+        }
+        Self { map }
+    }
+}
+
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
+#[class(base=Resource, init)]
+pub(crate) struct WithBundleResVec {
+    #[export]
+    #[serde(with = "gd_props::serde_gd::gd_resvec")]
+    pub vec: GdResVec<TestResource>,
+}
+
+#[derive(GodotClass)]
+#[class(base=Resource)]
+pub(crate) struct TestGodotResource {
+    #[export]
+    pub(crate) int: i32,
+    #[export]
+    pub(crate) str: GString,
+}
+
+impl TestGodotResource {
+    pub fn new() -> Self {
+        let mut rng = rand::thread_rng();
+        let int = rng.gen_range(-1000..1000);
+        let str = random_string(&mut rng, 10).into();
+        Self { int, str }
+    }
+
+    pub fn new_saved_multiple(path: &str, n: usize) -> HashMap<String, Gd<Self>> {
+        let mut obj = HashMap::new();
+        let mut saver = ResourceSaver::singleton();
+        for _ in 0..n {
+            let mut rng = rand::thread_rng();
+            let mut file = random_string(&mut rng, 10);
+            file.push_str(".tres");
+            let mut res = Gd::<TestGodotResource>::default();
+            res.set_path(format!("{path}{file}").into());
+            saver.save(res.clone().upcast());
+            obj.insert(file, res);
+        }
+        obj
+    }
+}
+
+#[godot_api]
+impl IResource for TestGodotResource {
+    fn init(_base: godot::obj::Base<Self::Base>) -> Self {
+        Self::new()
+    }
+}
+
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
+#[class(base=Resource, init)]
+pub(crate) struct WithExtGd {
+    #[export]
+    #[serde(with = "gd_props::serde_gd::ext")]
+    pub first: Gd<TestResource>,
+    #[export]
+    #[serde(with = "gd_props::serde_gd::ext_option")]
+    pub second: Option<Gd<TestGodotResource>>,
+}
+
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
+#[class(base=Resource, init)]
+pub(crate) struct WithExtResVec {
+    #[serde(with = "gd_props::serde_gd::ext_resvec")]
+    pub vec: GdResVec<TestGodotResource>,
+}
+
+#[derive(GodotClass, Serialize, Deserialize, GdProp)]
+#[class(base=Resource, init)]
+pub(crate) struct WithExtHashMap {
+    #[serde(with = "gd_props::serde_gd::ext_hashmap")]
+    pub map: HashMap<String, Gd<TestGodotResource>>,
 }

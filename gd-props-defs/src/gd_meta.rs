@@ -2,7 +2,7 @@ use std::io::BufRead;
 
 use godot::builtin::GString;
 use godot::engine::file_access::ModeFlags;
-use godot::engine::{FileAccess, GFile, Resource, ResourceLoader};
+use godot::engine::{FileAccess, GFile, Resource, ResourceLoader, ResourceUid};
 use godot::obj::Gd;
 
 use serde::{Deserialize, Serialize};
@@ -121,10 +121,22 @@ impl GdMetaExt {
         None
     }
     fn try_load_from_uid(&self, resource_loader: &mut Gd<ResourceLoader>) -> Option<Gd<Resource>> {
-        resource_loader.load(GString::from(&self.uid))
+        let resource_uid = ResourceUid::singleton();
+        let id = resource_uid.text_to_id(GString::from(&self.uid));
+        if resource_uid.has_id(id) {
+            resource_loader
+                .load_ex(GString::from(&self.uid))
+                .type_hint(GString::from(&self.gd_class))
+                .done()
+        } else {
+            None
+        }
     }
     fn try_load_from_path(&self, resource_loader: &mut Gd<ResourceLoader>) -> Option<Gd<Resource>> {
-        resource_loader.load(GString::from(&self.path))
+        resource_loader
+            .load_ex(GString::from(&self.path))
+            .type_hint(GString::from(&self.gd_class))
+            .done()
     }
 }
 

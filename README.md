@@ -34,7 +34,6 @@ The following features are currently available. More will be listed in the `In D
 
 Features that will certainly be expanded upon:
 
-- Provide more submodules in the `serde_gd` module to support iterable `Gd<Resouce>` collections.
 - Make the `gdron` and `gdbin` formats interchangeable for release mode with a custom `EditorExportPlugin`.
 - Ensure everything works smoothly in compiled games, especially pointers to `.tres` resources after they are changed into `.res` format.
 
@@ -111,7 +110,9 @@ Both file are recognizable by Godot editor, can be loaded through it and attache
 ## Bundled resources
 What if we have a Resource which contains another resource, which we would want to save as a bundled resource? There are two modules that handle this case: 
 - `gd_props::serde_gd::gd_option` - for `Option<Gd<T>>` fields,
-- `gd_props::serde_gd::gd` - for `Gd<T>` fields.
+- `gd_props::serde_gd::gd` - for `Gd<T>` fields,
+- `gd_props::serde_gd::gd_resvec` - for vector collections of `Gd<T>` using `GdResVec` (see `Supplementary types` section),
+- `gd_props::serde_gd::gd_hashmap` - for `HashMap<K, Gd<T>` fields.
 
 There are some requirements for this to work:
 - `T` needs to be User-defined `GodotClass` inheriting from `Resource`,
@@ -161,8 +162,10 @@ Upon saving, we receive file as below:
 ## External Resources
 If you desire to preserve a sub-resource as an External Resource, akin to regular resource saving in Godot, `gd-props` provides two additional modules:
 
-- `gd_props::serde_gd::ext_option` - designed for `Option<Gd<T>>` fields.
-- `gd_props::serde_gd::ext` - designed for `Gd<T>` fields.
+- `gd_props::serde_gd::ext_option` - designed for `Option<Gd<T>>` fields,
+- `gd_props::serde_gd::ext` - designed for `Gd<T>` fields,
+- `gd_props::serde_gd::ext_resvec` - for vector collections of `Gd<T>` using `GdResVec` (see `Supplementary types` section),
+- `gd_props::serde_gd::ext_hashmap` - for `HashMap<K, Gd<T>` fields.
 
 To enable this functionality, a few requirements must be met:
 
@@ -263,3 +266,18 @@ unsafe impl ExtensionLibrary for MyExtension {
     }
 }
 ```
+
+## Supplementary types
+
+For now, this crate introduces only one utility type: `GdResVec`, a vector-like collection of `Gd` pointers to classes 
+inheriting from `Resource`.
+
+If you need to hold a collection of subresources in one field, deciding whether to use Godot's `Array`, which allows you 
+to export the collection to the Godot editor, or `Vec`, which is easier to work with in Rust, can be challenging.
+
+To alleviate this hurdle and avoid the declaration of additional `serde_gd` modules, the `GdResVec` has been created, 
+combining the best of both worlds:
+
+- It holds the pointers in a `Vec`, dereferences to it in Rust, and can be used as a regular vector.
+- It is transferred to the Godot side as a typed `Array`, making it easily accessible there by GDScript methods.
+- It implements Property and Export, allowing it to be exported.
