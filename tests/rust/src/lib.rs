@@ -1,4 +1,4 @@
-use godot::{builtin::GString, engine::DirAccess, init::*};
+use godot::{builtin::GString, engine::{DirAccess, EditorExportPlugin, Engine, EditorPlugin}, init::*};
 
 mod bench;
 mod itest;

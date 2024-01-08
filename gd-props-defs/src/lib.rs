@@ -1,4 +1,5 @@
 pub mod errors;
+pub mod export;
 pub(crate) mod gd_meta;
 pub(crate) mod gdprop;
 pub(crate) mod gdprop_io;
