@@ -2,7 +2,7 @@ use gd_props::traits::{GdPropLoader, GdPropSaver};
 use gd_rehearse::itest::gditest;
 use godot::builtin::GString;
 use godot::engine::{load, try_load, DirAccess, ResourceLoader, ResourceSaver};
-use godot::obj::UserClass;
+use godot::obj::NewGd;
 
 use crate::structs::prop_handlers::{PropLoader, PropSaver};
 use crate::structs::resource::TestResource;
@@ -81,7 +81,7 @@ fn save_and_load_global() {
     // Load resource.
 
     let load_res = try_load::<TestResource>(format!("{}{}", RES_PATH, RES_NAME));
-    assert!(load_res.is_some());
+    assert!(load_res.is_ok());
 
     let loaded = load_res.unwrap();
     let second = load::<TestResource>(format!("{}{}", RES_PATH, RES_NAME));

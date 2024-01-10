@@ -1,9 +1,8 @@
 use std::collections::HashMap;
 use std::io::BufWriter;
 
-use gd_props::types::GdResVec;
 use gd_rehearse::itest::gditest;
-use godot::builtin::GString;
+use godot::builtin::{GString, Array};
 use godot::engine::ResourceLoader;
 use godot::obj::Gd;
 
@@ -48,8 +47,8 @@ fn serde_bundled() {
 }
 
 #[gditest]
-fn serde_bundled_recvec() {
-    let resource = WithBundleHashMap::new(5);
+fn serde_bundled_array() {
+    let resource = WithBundleArray::new(5);
     let mut buffer = Vec::new();
     let mut serializer = rmp_serde::Serializer::new(BufWriter::new(&mut buffer));
 
@@ -57,19 +56,18 @@ fn serde_bundled_recvec() {
     assert!(result.is_ok());
     drop(serializer);
 
-    let result = rmp_serde::from_slice::<WithBundleHashMap>(&buffer);
+    let result = rmp_serde::from_slice::<WithBundleArray>(&buffer);
     assert!(result.is_ok());
     let deserialized = result.unwrap();
 
-    let keys = resource.map.keys();
-    for key in keys {
+    for i in 0..resource.array.len() {
         assert!(TestResource::check_set_eq(
-            resource.map.get(key).unwrap().bind().get_set(),
-            deserialized.map.get(key).unwrap().bind().get_set()
+            resource.array.get(i).bind().get_set(),
+            deserialized.array.get(i).bind().get_set()
         ));
         assert!(TestResource::check_vec_eq(
-            resource.map.get(key).unwrap().bind().get_vec(),
-            deserialized.map.get(key).unwrap().bind().get_vec()
+            resource.array.get(i).bind().get_vec(),
+            deserialized.array.get(i).bind().get_vec()
         ));
     }
 }
@@ -147,14 +145,14 @@ fn serde_external() {
 }
 
 #[gditest]
-fn serde_external_resvec() {
+fn serde_external_array() {
     let path = "res://";
     let subresources = TestGodotResource::new_saved_multiple(path, 5);
-    let mut vec = GdResVec::default();
+    let mut vec = Array::new();
     for (_, subresource) in subresources.iter() {
         vec.push(subresource.clone());
     }
-    let resource = WithExtResVec { vec };
+    let resource = WithExtArray { vec };
 
     let mut buffer = Vec::new();
     let mut serializer = Serializer::new(&mut buffer, None).unwrap();
@@ -163,13 +161,13 @@ fn serde_external_resvec() {
     assert!(result.is_ok());
     drop(serializer);
 
-    let result = ron::de::from_bytes::<WithExtResVec>(&buffer);
+    let result = ron::de::from_bytes::<WithExtArray>(&buffer);
     assert!(result.is_ok());
     let deserialized = result.unwrap();
 
     let mut deserialized_hash = HashMap::new();
 
-    for subresource in deserialized.vec.iter() {
+    for subresource in deserialized.vec.iter_shared() {
         let res_path = subresource.get_path().to_string();
         let trimmed = res_path.trim_start_matches(path.clone());
         deserialized_hash.insert(trimmed.to_owned(), subresource.clone());

@@ -1,13 +1,11 @@
 use godot::engine::{Engine, Object};
-use godot::obj::cap::GodotDefault;
-use godot::obj::dom::UserDomain;
-use godot::obj::mem::StaticRefCount;
-use godot::obj::{Gd, Inherits};
+use godot::obj::bounds::MemRefCounted;
+use godot::obj::{Gd, Inherits, UserClass, Bounds};
 use godot::prelude::GodotClass;
 
 pub(crate) trait GodotSingleton
 where
-    Self: GodotClass<Declarer = UserDomain> + Inherits<Object> + GodotDefault<Mem = StaticRefCount>,
+    Self: GodotClass + UserClass + Inherits<Object> + Bounds<Memory = MemRefCounted>,
 {
     const SINGLETON_NAME: &'static str;
 

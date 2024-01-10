@@ -5,7 +5,7 @@ use godot::engine::global::Error;
 use godot::engine::{
     try_load, DirAccess, IResourceFormatLoader, IResourceFormatSaver, ResourceLoader, ResourceSaver,
 };
-use godot::obj::{Gd, UserClass};
+use godot::obj::{Gd, NewGd};
 
 use crate::remove_file;
 use crate::structs::prop_handlers::{PropLoader, PropSaver};
@@ -143,7 +143,7 @@ fn can_load_bundled() {
     );
 
     let load_res = try_load::<WithBundledGd>(file_path);
-    assert!(load_res.is_some());
+    assert!(load_res.is_ok());
     let res = load_res.unwrap();
     assert!(TestResource::check_set_eq(
         res.bind().first.bind().get_set(),

@@ -4,10 +4,10 @@ use godot::bind::GodotClass;
 
 #[derive(GodotClass, GdPropSaver)]
 #[class(init, base = ResourceFormatSaver, tool)]
-#[register(TestResource, WithBundledGd, WithExtGd, WithBundleResVec)]
+#[register(TestResource, WithBundledGd, WithExtGd, WithBundleArray)]
 pub struct PropSaver;
 
 #[derive(GodotClass, GdPropLoader)]
 #[class(init, base = ResourceFormatLoader, tool)]
-#[register(TestResource, WithBundledGd, WithExtGd, WithBundleResVec)]
+#[register(TestResource, WithBundledGd, WithExtGd, WithBundleArray)]
 pub struct PropLoader;

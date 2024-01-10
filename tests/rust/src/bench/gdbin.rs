@@ -1,7 +1,7 @@
 use gd_rehearse::bench::gdbench;
 use godot::builtin::GString;
 use godot::engine::{IResourceFormatLoader, IResourceFormatSaver};
-use godot::obj::{Gd, UserClass};
+use godot::obj::{Gd, NewGd};
 use serde::{Deserialize, Serialize};
 
 use crate::remove_file;

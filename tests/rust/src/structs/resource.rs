@@ -2,8 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use gd_props::GdProp;
 
-use gd_props::types::GdResVec;
-use godot::builtin::GString;
+use godot::builtin::{GString, Array};
 use godot::engine::{IResource, ResourceSaver};
 use godot::obj::Gd;
 use godot::prelude::{godot_api, GodotClass};
@@ -153,10 +152,28 @@ impl WithBundleHashMap {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithBundleResVec {
+pub(crate) struct WithBundleArray {
     #[export]
-    #[serde(with = "gd_props::serde_gd::gd_resvec")]
-    pub vec: GdResVec<TestResource>,
+    #[serde(with = "gd_props::serde_gd::gd_array")]
+    pub array: Array<Gd<TestResource>>,
+}
+
+impl WithBundleArray {
+    pub fn new(res_n: usize) -> Self {
+        let mut array = Array::new();
+        let mut rng = rand::thread_rng();
+        let mut set = HashSet::new();
+        for _ in 0..res_n {
+            set.insert(rng.gen_range(-256..=256));
+        }
+        for _ in set {
+            let vec_n = rng.gen_range(1..10);
+            let set_n = rng.gen_range(1..10);
+            let res = TestResource::new_random(set_n, vec_n);
+            array.push(res);
+        }
+        Self { array }
+    }
 }
 
 #[derive(GodotClass)]
@@ -212,9 +229,9 @@ pub(crate) struct WithExtGd {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithExtResVec {
-    #[serde(with = "gd_props::serde_gd::ext_resvec")]
-    pub vec: GdResVec<TestGodotResource>,
+pub(crate) struct WithExtArray {
+    #[serde(with = "gd_props::serde_gd::ext_array")]
+    pub vec: Array<Gd<TestGodotResource>>,
 }
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]

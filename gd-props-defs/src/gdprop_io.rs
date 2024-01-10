@@ -2,14 +2,13 @@ use godot::builtin::meta::ToGodot;
 use godot::builtin::{GString, PackedStringArray, Variant};
 use godot::engine::global::Error;
 use godot::engine::{
-    Engine, IResourceFormatLoader, IResourceFormatSaver, Object, RefCounted, ResourceFormatLoader,
+    Engine, IResourceFormatLoader, IResourceFormatSaver, Object, ResourceFormatLoader,
     ResourceFormatSaver, ResourceUid,
 };
 use godot::log::{godot_error, godot_warn};
+use godot::obj::bounds::MemRefCounted;
 use godot::obj::cap::GodotDefault;
-use godot::obj::dom::UserDomain;
-use godot::obj::mem::StaticRefCount;
-use godot::obj::{Gd, GodotClass, Inherits};
+use godot::obj::{Gd, GodotClass, Inherits, UserClass, Bounds};
 
 use crate::errors::GdPropError;
 use crate::gd_meta::GdMetaHeader;
@@ -53,11 +52,13 @@ impl GdPropFormat {
 
 pub trait GdPropLoader
 where
-    Self: GodotClass<Declarer = UserDomain>
+    Self: GodotClass
+        + UserClass
+        + Bounds<Memory = MemRefCounted>
         + Inherits<ResourceFormatLoader>
         + Inherits<Object>
         + IResourceFormatLoader
-        + GodotDefault<Mem = StaticRefCount>,
+        + GodotDefault,
 {
     /// Name under which the object registers in Godot as a singleton.
     const SINGLETON_NAME: &'static str;
@@ -186,12 +187,12 @@ where
 
 pub trait GdPropSaver
 where
-    Self: GodotClass<Declarer = UserDomain>
+    Self: GodotClass
+        + Bounds<Memory = MemRefCounted>
         + Inherits<ResourceFormatSaver>
-        + Inherits<RefCounted>
         + Inherits<Object>
         + IResourceFormatSaver
-        + GodotDefault<Mem = StaticRefCount>,
+        + GodotDefault,
 {
     /// Name under which the object registers in Godot as a singleton
     const SINGLETON_NAME: &'static str;
