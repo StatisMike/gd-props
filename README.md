@@ -1,4 +1,6 @@
 # gd-props
+![tests workflow](https://github.com/StatisMike/gd-props/actions/workflows/tests.yaml/badge.svg)
+[![Latest compatible gdext](https://byob.yarr.is/StatisMike/gd-props/gdext_latest_success)](https://github.com/godot-rust/gdext)
 
 > Resources are akin to the versatile props that set the scene for an interactive masterpiece on the stage of game world. 
 > Much like actors skillfully employ props to enrich their storytelling, game objects leverage resources to craft a compelling virtual 
@@ -111,7 +113,7 @@ Both file are recognizable by Godot editor, can be loaded through it and attache
 What if we have a Resource which contains another resource, which we would want to save as a bundled resource? There are two modules that handle this case: 
 - `gd_props::serde_gd::gd_option` - for `Option<Gd<T>>` fields,
 - `gd_props::serde_gd::gd` - for `Gd<T>` fields,
-- `gd_props::serde_gd::gd_resvec` - for vector collections of `Gd<T>` using `GdResVec` (see `Supplementary types` section),
+- `gd_props::serde_gd::gd_array` - for `Array<Gd<T>>` fields,
 - `gd_props::serde_gd::gd_hashmap` - for `HashMap<K, Gd<T>` fields.
 
 There are some requirements for this to work:
@@ -164,7 +166,7 @@ If you desire to preserve a sub-resource as an External Resource, akin to regula
 
 - `gd_props::serde_gd::ext_option` - designed for `Option<Gd<T>>` fields,
 - `gd_props::serde_gd::ext` - designed for `Gd<T>` fields,
-- `gd_props::serde_gd::ext_resvec` - for vector collections of `Gd<T>` using `GdResVec` (see `Supplementary types` section),
+- `gd_props::serde_gd::ext_array` - for `Array<Gd<T>>` fields,
 - `gd_props::serde_gd::ext_hashmap` - for `HashMap<K, Gd<T>` fields.
 
 To enable this functionality, a few requirements must be met:
@@ -266,18 +268,3 @@ unsafe impl ExtensionLibrary for MyExtension {
     }
 }
 ```
-
-## Supplementary types
-
-For now, this crate introduces only one utility type: `GdResVec`, a vector-like collection of `Gd` pointers to classes 
-inheriting from `Resource`.
-
-If you need to hold a collection of subresources in one field, deciding whether to use Godot's `Array`, which allows you 
-to export the collection to the Godot editor, or `Vec`, which is easier to work with in Rust, can be challenging.
-
-To alleviate this hurdle and avoid the declaration of additional `serde_gd` modules, the `GdResVec` has been created, 
-combining the best of both worlds:
-
-- It holds the pointers in a `Vec`, dereferences to it in Rust, and can be used as a regular vector.
-- It is transferred to the Godot side as a typed `Array`, making it easily accessible there by GDScript methods.
-- It implements Property and Export, allowing it to be exported.

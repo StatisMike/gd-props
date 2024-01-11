@@ -1,16 +1,15 @@
 use godot::engine::Resource;
-use godot::obj::dom::UserDomain;
-use godot::obj::{Gd, GodotClass, Inherits};
+use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 
 use serde::{Serialize, Serializer};
 
 pub(crate) struct GodotPointerSerWrapper<
-    T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Serialize,
+    T: GodotClass + UserClass + Inherits<Resource> + Serialize,
 >(Gd<T>);
 
 impl<T> Serialize for GodotPointerSerWrapper<T>
 where
-    T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Serialize,
+    T: GodotClass + UserClass + Inherits<Resource> + Serialize,
 {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -19,10 +18,10 @@ where
         self.0.bind().serialize(serializer)
     }
 }
-/// Module that can be used to serialize and deserialize objects castable to [Resouce](godot::engine::Resource) on basis
-/// of their [Gd].
+/// Module that can be used to serialize and deserialize objects castable to [`Resouce`](godot::engine::Resource) on basis
+/// of their [`Gd`].
 ///
-/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on resources containing pointers to other
+/// Its main use is to derive [`serde::Serialize`] and [`serde::Deserialize`] on resources containing pointers to other
 /// resources, while keeping data from every one.
 ///
 /// ## Example
@@ -55,15 +54,14 @@ where
 /// ```
 pub mod gd {
     use godot::engine::Resource;
-    use godot::obj::dom::UserDomain;
-    use godot::obj::{Gd, GodotClass, Inherits};
+    use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 
     use serde::{de, ser, Deserialize, Serialize};
 
     pub fn deserialize<'de, D, T>(deserializer: D) -> Result<Gd<T>, D::Error>
     where
         D: de::Deserializer<'de>,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Deserialize<'de>,
+        T: GodotClass + UserClass + Inherits<Resource> + Deserialize<'de>,
     {
         let res = T::deserialize(deserializer)?;
         Ok(Gd::from_object(res))
@@ -72,16 +70,16 @@ pub mod gd {
     pub fn serialize<S, T>(pointer: &Gd<T>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: ser::Serializer,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Serialize,
+        T: GodotClass + UserClass + Inherits<Resource> + Serialize,
     {
         pointer.bind().serialize(serializer)
     }
 }
 
-/// Module that can be used to serialize and deserialize objects castable to [Resouce](godot::engine::Resource) on basis
-/// of their [Option]<[Gd]>.
+/// Module that can be used to serialize and deserialize objects castable to [`Resouce`](godot::engine::Resource) on basis
+/// of their [`Option`]<[`Gd`]>.
 ///
-/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on resources containing optional pointers
+/// Its main use is to derive [`serde::Serialize`] and [`serde::Deserialize`] on resources containing optional pointers
 /// to other resources, while keeping data from every one (if attached).
 ///
 /// ## Example
@@ -112,8 +110,7 @@ pub mod gd {
 pub mod gd_option {
 
     use godot::engine::Resource;
-    use godot::obj::dom::UserDomain;
-    use godot::obj::{Gd, GodotClass, Inherits};
+    use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 
     use serde::{de, ser, Deserialize, Serialize};
 
@@ -122,7 +119,7 @@ pub mod gd_option {
     pub fn deserialize<'de, D, T>(deserializer: D) -> Result<Option<Gd<T>>, D::Error>
     where
         D: de::Deserializer<'de>,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Deserialize<'de>,
+        T: GodotClass + UserClass + Inherits<Resource> + Deserialize<'de>,
     {
         match Option::<T>::deserialize(deserializer)? {
             Some(obj) => Ok(Some(Gd::from_object(obj))),
@@ -133,7 +130,7 @@ pub mod gd_option {
     pub fn serialize<S, T>(pointer: &Option<Gd<T>>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: ser::Serializer,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Serialize,
+        T: GodotClass + UserClass + Inherits<Resource> + Serialize,
     {
         match pointer {
             Some(ptr) => {
@@ -150,7 +147,7 @@ pub mod gd_option {
 /// Module that can be used to serialize and deserialize objects castable to [`Resource`](godot::engine::Resource) on basis
 /// of their pointers contained within [`HashMap`](std::collections::HashMap) as bundled resources.
 ///
-/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on resources containing optional pointers
+/// Its main use is to derive [`serde::Serialize`] and [`serde::Deserialize`] on resources containing optional pointers
 /// to other resources, while keeping data from every one (if attached).
 ///
 /// ## Example
@@ -184,8 +181,7 @@ pub mod gd_hashmap {
     use std::hash::Hash;
 
     use godot::engine::Resource;
-    use godot::obj::dom::UserDomain;
-    use godot::obj::{Gd, GodotClass, Inherits};
+    use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 
     use serde::{Deserialize, Serialize};
 
@@ -194,7 +190,7 @@ pub mod gd_hashmap {
     pub fn serialize<S, T, K>(map: &HashMap<K, Gd<T>>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::ser::Serializer,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Serialize,
+        T: GodotClass + UserClass + Inherits<Resource> + Serialize,
         K: Hash + Eq + PartialEq + Serialize + Clone,
     {
         // Serialize each Gd<T> using the GodotPointerWrapper
@@ -208,7 +204,7 @@ pub mod gd_hashmap {
     pub fn deserialize<'de, D, T, K>(deserializer: D) -> Result<HashMap<K, Gd<T>>, D::Error>
     where
         D: serde::de::Deserializer<'de>,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Deserialize<'de>,
+        T: GodotClass + UserClass + Inherits<Resource> + Deserialize<'de>,
         K: Hash + Eq + PartialEq + Deserialize<'de> + Clone,
     {
         // Deserialize a vector of GodotPointerWrapper<T> and then extract the inner Gd<T> values
@@ -221,11 +217,11 @@ pub mod gd_hashmap {
     }
 }
 
-/// Module that can be used to serialize and deserialize objects castable to [Resouce](godot::engine::Resource) on basis
-/// of their pointers contained within [GdResVec](crate::types::GdResVec) collection.
+/// Module that can be used to serialize and deserialize objects castable to [`Resource`](godot::engine::Resource) on basis
+/// of their pointers contained within [`Array`](godot::builtin::Array) collection.
 ///
-/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on resources containing optional pointers
-/// to other resources, while keeping data from every one.
+/// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on resources containing pointers to other 
+/// resources, while keeping data from every one in serialized struct.
 ///
 /// ## Example
 ///
@@ -234,7 +230,6 @@ pub mod gd_hashmap {
 /// use godot::engine::{Resource, IResource};
 /// use godot::builtin::Array;
 /// use serde::{Serialize, Deserialize};
-/// use gd_props::types::GdResVec;
 ///
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(base=Resource, init)]
@@ -247,60 +242,60 @@ pub mod gd_hashmap {
 /// #[class(init, base=Resource)]
 /// struct OuterResource {
 ///     #[export]
-///     #[serde(with="gd_props::serde_gd::gd_resvec")]
-///     inner: GdResVec<InnerResource>
+///     #[serde(with="gd_props::serde_gd::gd_array")]
+///     inner: Array<Gd<InnerResource>>
 /// }
 ///
 /// #[godot_api]
 /// impl OuterResource {}
 /// ```
-pub mod gd_resvec {
+pub mod gd_array {
     use godot::engine::Resource;
-    use godot::obj::dom::UserDomain;
+    use godot::obj::UserClass;
     use godot::obj::{Gd, GodotClass, Inherits};
+    use godot::builtin::Array;
 
     use serde::{Deserialize, Serialize};
 
     use super::GodotPointerSerWrapper;
-    use crate::types::GdResVec;
 
-    pub fn serialize<S, T>(resvec: &GdResVec<T>, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S, T>(resvec: &Array<Gd<T>>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: serde::ser::Serializer,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Serialize,
+        T: GodotClass + UserClass + Inherits<Resource> + Serialize,
     {
         // Serialize each Gd<T> using the GodotPointerWrapper
         let wrapper_vec: Vec<_> = resvec
-            .iter()
+            .iter_shared()
             .map(|gd| GodotPointerSerWrapper(gd.clone()))
             .collect();
         wrapper_vec.serialize(serializer)
     }
 
-    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<GdResVec<T>, D::Error>
+    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<Array<Gd<T>>, D::Error>
     where
         D: serde::de::Deserializer<'de>,
-        T: GodotClass<Declarer = UserDomain> + Inherits<Resource> + Deserialize<'de>,
+        T: GodotClass + UserClass + Inherits<Resource> + Deserialize<'de>,
     {
         // Deserialize a vector of GodotPointerWrapper<T> and then extract the inner Gd<T> values
         let wrapper_vec: Vec<T> = Vec::deserialize(deserializer)?;
-        let gd_vec: Vec<Gd<T>> = wrapper_vec
+        let gd_vec: Array<Gd<T>> = wrapper_vec
             .into_iter()
             .map(|obj| Gd::<T>::from_object(obj))
             .collect();
-        Ok(GdResVec::from_vec(gd_vec))
+        Ok(gd_vec)
     }
 }
 
-/// Module that can be used to serialize and deserialize External Resources kept within your custom [Resource].  
+/// Module that can be used to serialize and deserialize External Resources kept within your custom [`Resource`].  
 ///
-/// External Resource which [Gd] is contained within the annotated field don't need to implement [serde::Serialize] and
-/// [serde::Deserialize] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
+/// External Resource which [`Gd`] is contained within the annotated field don't need to implement [`serde::Serialize`] and
+/// [`serde::Deserialize`] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
 /// is saved upon serialization as and upon deserialization, the resource is loaded using
-/// [ResourceLoader](godot::engine::ResourceLoader) singleton on its basis.
+/// [`ResourceLoader`](godot::engine::ResourceLoader) singleton on its basis.
 ///
-/// The External Resource can be both godot built-in resource and other rust-defined custom [Resource]. Only runtime
-/// requirement is that the [ResourceFormatLoader](godot::engine::ResourceFormatLoader) is registered in global `ResourceLoader`.
+/// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime
+/// requirement is that the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global `ResourceLoader`.
 ///
 /// ## Example
 ///
@@ -370,15 +365,16 @@ pub mod ext {
     }
 }
 
-/// Module that can be used to serialize and deserialize optional External Resources kept within your custom [Resource].  
+/// Module that can be used to serialize and deserialize optional External Resources kept within your custom [`Resource`].  
 ///
-/// External Resource which [Option]<[Gd]> is contained within the annotated field don't need to implement [serde::Serialize]
-/// and [serde::Deserialize] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
-/// is saved upon serialization and upon deserialization, the resource is loaded using [ResourceLoader](godot::engine::ResourceLoader) singleton
+/// External Resource which optional godot pointer is contained within the annotated field don't need to implement [`serde::Serialize`]
+/// and [`serde::Deserialize`] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
+/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader) singleton
 /// on basis of this data.
 ///
-/// The External Resource can be both godot built-in resource and other rust-defined custom [Resource]. Only runtime
-/// requirement is that the [ResourceFormatLoader](godot::engine::ResourceFormatLoader) is registered in global `ResourceLoader`.
+/// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime
+/// requirement is that the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global 
+/// [`ResourceLoader`](godot::engine::ResourceLoader).
 ///
 /// ## Example
 ///
@@ -442,16 +438,16 @@ pub mod ext_option {
     }
 }
 
-/// Module that can be used to serialize and deserialize optional External Resources kept within your custom [Resource]
-/// in a [HashMap](std::collections::HashMap).  
+/// Module that can be used to serialize and deserialize optional External Resources kept within your custom [`Resource`]
+/// in a [`HashMap`](std::collections::HashMap).  
 ///
 /// External Resource which pointers are contained within the annotated `HashMap` field don't need to implement [serde::Serialize]
 /// and [serde::Deserialize] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
 /// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader) singleton
 /// on basis of this data.
 ///
-/// The External Resource can be both godot built-in resource and other rust-defined custom [Resource]. Only runtime
-/// requirement is that the [ResourceFormatLoader](godot::engine::ResourceFormatLoader) is registered in global `ResourceLoader`.
+/// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime requirement is that 
+/// the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global [`ResourceLoader`](godot::engine::ResourceLoader).
 ///
 /// ## Example
 ///
@@ -543,16 +539,16 @@ pub mod ext_hashmap {
     }
 }
 
-/// Module that can be used to serialize and deserialize optional External Resources kept within your custom [Resource]
-/// in a [GdResVec](crate::types::GdResVec).  
+/// Module that can be used to serialize and deserialize External Resources kept within your custom [`Resource`] in an 
+/// [`Array`](godot::builtin::Array) collection.  
 ///
 /// External Resource which pointers are contained within the annotated `GdResVec` field don't need to implement [serde::Serialize]
 /// and [serde::Deserialize] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
-/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader) singleton
-/// on basis of this data.
+/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader)
+/// singleton on basis of this data.
 ///
-/// The External Resource can be both godot built-in resource and other rust-defined custom [Resource]. Only runtime
-/// requirement is that the [ResourceFormatLoader](godot::engine::ResourceFormatLoader) is registered in global `ResourceLoader`.
+/// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime requirement is that 
+/// the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global [`ResourceLoader`](godot::engine::ResourceLoader).
 ///
 /// ## Example
 ///
@@ -561,8 +557,6 @@ pub mod ext_hashmap {
 /// use godot::engine::{Resource, IResource};
 /// use godot::builtin::Array;
 /// use serde::{Serialize, Deserialize};
-/// use std::collections::HashMap;
-/// use gd_props::types::GdResVec;
 ///
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(base=Resource, init)]
@@ -574,29 +568,29 @@ pub mod ext_hashmap {
 /// #[derive(GodotClass, Serialize, Deserialize)]
 /// #[class(init, base=Resource)]
 /// struct OuterResource {
-///     #[serde(with="gd_props::serde_gd::ext_resvec")]
-///     inner: GdResVec<InnerResource>
+///     #[serde(with="gd_props::serde_gd::ext_array")]
+///     inner: Array<Gd<InnerResource>>
 /// }
 ///
 /// #[godot_api]
 /// impl OuterResource {}
 /// ```
-pub mod ext_resvec {
+pub mod ext_array {
 
     use crate::gd_meta::{GdExtResource, GdMetaExt};
-    use crate::types::GdResVec;
+    use godot::builtin::Array;
     use godot::engine::Resource;
-    use godot::obj::{GodotClass, Inherits};
+    use godot::obj::{GodotClass, Inherits, Gd};
     use serde::{de, ser, Deserialize, Serialize};
 
-    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<GdResVec<T>, D::Error>
+    pub fn deserialize<'de, D, T>(deserializer: D) -> Result<Array<Gd<T>>, D::Error>
     where
         D: de::Deserializer<'de>,
         T: GodotClass + Inherits<Resource>,
     {
         let vec: Vec<GdExtResource> = Deserialize::deserialize(deserializer)?;
 
-        let mut result = GdResVec::default();
+        let mut result = Array::new();
 
         for element in vec {
             if let GdExtResource::ExtResource(meta) = element {
@@ -612,7 +606,7 @@ pub mod ext_resvec {
         Ok(result)
     }
 
-    pub fn serialize<S, T>(vec: &GdResVec<T>, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S, T>(vec: &Array<Gd<T>>, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: ser::Serializer,
         T: GodotClass + Inherits<Resource>,
@@ -621,7 +615,7 @@ pub mod ext_resvec {
         let res_uid = godot::engine::ResourceUid::singleton();
 
         let serialized: Vec<GdExtResource> = vec
-            .iter()
+            .iter_shared()
             .map(|element| {
                 let upcasted = element.clone().upcast::<Resource>();
                 let path = upcasted.get_path();

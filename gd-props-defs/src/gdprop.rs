@@ -6,8 +6,7 @@ use godot::engine::file_access::ModeFlags;
 use godot::engine::global::Error;
 use godot::engine::{FileAccess, GFile, Resource, ResourceUid};
 use godot::log::godot_error;
-use godot::obj::dom::UserDomain;
-use godot::obj::{Gd, GodotClass, Inherits};
+use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 use rmp_serde::Serializer;
 use serde::{Deserialize, Serialize};
 
@@ -22,7 +21,8 @@ pub trait GdProp
 where
     Self: Serialize
         + for<'de> Deserialize<'de>
-        + GodotClass<Declarer = UserDomain>
+        + GodotClass
+        + UserClass
         + Inherits<Resource>,
 {
     /// Struct identifier included in `gdron` file.

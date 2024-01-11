@@ -2,7 +2,7 @@ use gd_rehearse::itest::gditest;
 use godot::builtin::meta::FromGodot;
 use godot::builtin::GString;
 use godot::engine::{DirAccess, IResourceFormatLoader, IResourceFormatSaver};
-use godot::obj::{Gd, UserClass};
+use godot::obj::{Gd, NewGd};
 
 use crate::remove_file;
 use crate::structs::prop_handlers::{PropLoader, PropSaver};
