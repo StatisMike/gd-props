@@ -1,4 +1,8 @@
-use godot::{builtin::GString, engine::{DirAccess, EditorExportPlugin, Engine, EditorPlugin}, init::*};
+use godot::{
+    builtin::GString,
+    engine::DirAccess,
+    init::*,
+};
 
 mod bench;
 mod itest;
@@ -30,6 +34,15 @@ unsafe impl ExtensionLibrary for GodotIoTests {
             PropSaver::register_saver();
             PropLoader::register_loader();
             // _ = TestResource::singleton();
+        }
+    }
+
+    fn on_level_deinit(deinit: InitLevel) {
+        if deinit == InitLevel::Scene {
+            use gd_props::traits::GdPropLoader as _;
+            use gd_props::traits::GdPropSaver as _;
+            PropSaver::unregister_saver_singleton();
+            PropLoader::unregister_loader_singleton();
         }
     }
 }

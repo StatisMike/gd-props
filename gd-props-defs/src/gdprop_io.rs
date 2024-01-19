@@ -8,7 +8,7 @@ use godot::engine::{
 use godot::log::{godot_error, godot_warn};
 use godot::obj::bounds::MemRefCounted;
 use godot::obj::cap::GodotDefault;
-use godot::obj::{Gd, GodotClass, Inherits, UserClass, Bounds};
+use godot::obj::{Bounds, Gd, GodotClass, Inherits, UserClass};
 
 use crate::errors::GdPropError;
 use crate::gd_meta::GdMetaHeader;
@@ -123,6 +123,10 @@ where
         let instance = Self::loader_singleton();
         let loader = &mut godot::engine::ResourceLoader::singleton();
         loader.add_resource_format_loader(instance.upcast());
+    }
+
+    fn unregister_loader_singleton() {
+        Engine::singleton().unregister_singleton(Self::SINGLETON_NAME.into());
     }
 
     #[doc(hidden)]
@@ -257,6 +261,10 @@ where
         let instance = Self::saver_singleton();
         let saver = &mut godot::engine::ResourceSaver::singleton();
         saver.add_resource_format_saver(instance.upcast::<ResourceFormatSaver>());
+    }
+
+    fn unregister_saver_singleton() {
+        Engine::singleton().unregister_singleton(Self::SINGLETON_NAME.into());
     }
 
     #[doc(hidden)]

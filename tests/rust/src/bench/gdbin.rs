@@ -33,7 +33,7 @@ fn deserialize() -> bool {
     true
 }
 
-#[gdbench(repeat = 5)]
+#[gdbench(repeat = 5, scene_path="res://dev_test.tscn")]
 fn gdbin_save() -> bool {
     let path = "res://";
     let file = "test.gdbin";

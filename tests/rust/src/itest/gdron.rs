@@ -11,7 +11,7 @@ use crate::remove_file;
 use crate::structs::prop_handlers::{PropLoader, PropSaver};
 use crate::structs::resource::{TestGodotResource, TestResource, WithBundledGd, WithExtGd};
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn can_save() {
     let path = "res://";
     let file = "test.gdron";
@@ -51,7 +51,7 @@ fn can_load() {
     assert_eq!(resource.get_class(), GString::from("TestResource"));
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn loaded_and_saved_identical() {
     let path = "res://";
     let file = "test.gdron";
@@ -80,7 +80,7 @@ fn loaded_and_saved_identical() {
     assert!(TestResource::check_vec_eq(&saved_vec, &loaded_vec));
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn uid_is_stable() {
     let path = "res://";
     let file = "test.gdron";
@@ -108,7 +108,7 @@ fn uid_is_stable() {
     remove_file(path, file);
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn can_save_bundled() {
     let path = "res://";
     let file = "test.gdron";
@@ -126,7 +126,7 @@ fn can_save_bundled() {
     remove_file(path, file);
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn can_load_bundled() {
     let path = "res://";
     let file = "test.gdron";
@@ -170,7 +170,7 @@ fn can_load_bundled() {
     };
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn can_save_external() {
     let path = "res://";
     let file = "test.gdron";

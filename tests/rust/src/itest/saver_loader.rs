@@ -61,7 +61,7 @@ fn gd_loader_register() {
     }
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn save_and_load_global() {
     let resource = TestResource::new_random(5, 3);
     let mut da = DirAccess::open(RES_PATH.into()).unwrap();

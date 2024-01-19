@@ -22,11 +22,13 @@
 
 pub use gd_props_macros::GdProp;
 pub use gd_props_macros::GdPropLoader;
+pub use gd_props_macros::GdPropPlugin;
 pub use gd_props_macros::GdPropSaver;
 
 /// Module containing traits implemented by provided macros. There shouldn't be a necessity to implement them directly by the user.
 pub mod traits {
     pub use gd_props_defs::traits::GdProp;
+    pub use gd_props_defs::traits::GdPropExporter;
     pub use gd_props_defs::traits::GdPropLoader;
     pub use gd_props_defs::traits::GdPropSaver;
 }

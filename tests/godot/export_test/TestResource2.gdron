@@ -1,0 +1,15 @@
+(gd_class:"TestResource",uid:"uid://cnfnl5d1um4c5")
+(
+    set: [
+        (
+            int: 2137,
+            character: 'A',
+        ),
+    ],
+    vec: [
+        (
+            int: -2137,
+            character: 'Z',
+        ),
+    ],
+)

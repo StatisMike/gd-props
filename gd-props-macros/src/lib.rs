@@ -2,6 +2,7 @@ use crate::translate::translate;
 use proc_macro::{self, TokenStream};
 
 pub(crate) mod gdprop;
+pub(crate) mod plugin;
 pub(crate) mod translate;
 pub(crate) mod utils;
 
@@ -179,4 +180,9 @@ pub fn derive_gd_loader(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(GdPropSaver, attributes(register))]
 pub fn derive_gd_saver(input: TokenStream) -> TokenStream {
     translate(input, gdprop::derive_saver)
+}
+
+#[proc_macro_derive(GdPropPlugin, attributes(register, exporter))]
+pub fn derive_prop_plugin(input: TokenStream) -> TokenStream {
+    translate(input, plugin::derive_plugin)
 }

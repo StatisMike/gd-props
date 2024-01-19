@@ -19,11 +19,7 @@ use crate::gd_meta::GdMetaHeader;
 /// - `.gdron` files, based on [ron]
 pub trait GdProp
 where
-    Self: Serialize
-        + for<'de> Deserialize<'de>
-        + GodotClass
-        + UserClass
-        + Inherits<Resource>,
+    Self: Serialize + for<'de> Deserialize<'de> + GodotClass + UserClass + Inherits<Resource>,
 {
     /// Struct identifier included in `gdron` file.
     const HEAD_IDENT: &'static str;

@@ -1,6 +1,6 @@
 use godot::engine::{Engine, Object};
 use godot::obj::bounds::MemRefCounted;
-use godot::obj::{Gd, Inherits, UserClass, Bounds};
+use godot::obj::{Bounds, Gd, Inherits, UserClass};
 use godot::prelude::GodotClass;
 
 pub(crate) trait GodotSingleton
