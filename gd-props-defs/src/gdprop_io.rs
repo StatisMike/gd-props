@@ -5,7 +5,7 @@ use godot::engine::{
     Engine, IResourceFormatLoader, IResourceFormatSaver, Object, ResourceFormatLoader,
     ResourceFormatSaver, ResourceUid,
 };
-use godot::log::{godot_error, godot_warn};
+use godot::log::{godot_error, godot_print, godot_warn};
 use godot::obj::bounds::MemRefCounted;
 use godot::obj::cap::GodotDefault;
 use godot::obj::{Bounds, Gd, GodotClass, Inherits, UserClass};

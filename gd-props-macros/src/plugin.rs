@@ -61,15 +61,17 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
             let mut bytes: Option<::godot::builtin::PackedByteArray> = None;
 
+            let changed_path = Self::_int_ron_to_bin_change_path(path.clone());
+
             #(
               if type_.eq(&::godot::builtin::GString::from(#registers::HEAD_IDENT)) {
-                bytes = self._int_process_ron_file::<#registers>(path.clone(), type_.clone());
+                bytes = Some(self._int_process_ron_file::<#registers>(path.clone(), changed_path.clone()));
               }
             )*
 
             if let Some(bytes) = bytes {
-              ::godot::log::godot_print!("Adding ron bytes as bin!");
-              self.base_mut().add_file(path.clone(), bytes, true);
+              ::godot::log::godot_print!("Adding resource of {} type, from: {}; Remapped to: {}", &type_, &path, &changed_path);
+              self.base_mut().add_file(changed_path, bytes, true);
             }
 
           } else if Self::_int_is_gdbin(path.clone()) {
@@ -79,7 +81,7 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
             bytes = Self::_int_read_file_to_bytes(path.clone());
 
             if let Some(bytes) = bytes {
-              ::godot::log::godot_print!("Adding bin bytes without check!");
+              ::godot::log::godot_print!("Adding resource of {} type, from: {}", &type_, &path);
               self.base_mut().add_file(path.clone(), bytes, false);
             }
           }

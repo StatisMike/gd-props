@@ -1,9 +1,10 @@
 use std::io::Read;
 
+use godot::builtin::meta::ClassName;
 use godot::builtin::{GString, PackedByteArray};
 use godot::engine::file_access::ModeFlags;
 use godot::engine::{
-    EditorExportPlugin, GFile, IEditorExportPlugin, Object, ResourceLoader,
+    load, save, try_load, EditorExportPlugin, FileAccess, GFile, IEditorExportPlugin, Object, Resource, ResourceLoader, ResourceSaver, ResourceUid
 };
 use godot::log::godot_error;
 use godot::obj::bounds::MemRefCounted;
@@ -25,7 +26,8 @@ where
     fn _int_ron_to_bin_change_path(path: GString) -> GString {
         let mut stringified = path.to_string();
 
-        stringified = stringified.replace(".gdron", ".gdbin");
+        stringified = stringified.replace(".gdron", "_ron_remap");
+        stringified.push_str(".gdbin");
 
         GString::from(stringified)
     }
@@ -40,26 +42,20 @@ where
 
     fn _int_process_ron_file<T>(
         &mut self,
-        path: GString,
-        _type_: GString,
-    ) -> Option<PackedByteArray>
+        ron_path: GString,
+        bin_path: GString,
+    ) -> PackedByteArray
     where
         T: GdProp,
     {
-        if let Some(res) = ResourceLoader::singleton().load(path.clone()) {
-            let mut buf = Vec::new();
-            let mut serializer = rmp_serde::Serializer::new(&mut buf);
-            let result = res.cast::<T>().bind().serialize(&mut serializer);
+        let mut loader = ResourceLoader::singleton();
+        let uid = loader.get_resource_uid(ron_path.clone());
+        let res = loader.load(ron_path.clone()).expect("can't get ron file");
 
-            if let Err(err) = result {
-                godot_error!("Error while serializing to gdbin: {err}");
-            }
+        set_id_for_path(uid, bin_path.clone());
+        save(res, bin_path.clone());
 
-            let mut array = PackedByteArray::new();
-            array.extend(buf);
-            return Some(array);
-        }
-        None
+        FileAccess::get_file_as_bytes(bin_path.clone())
     }
 
     fn _int_read_file_to_bytes(path: GString) -> Option<PackedByteArray> {
@@ -77,5 +73,17 @@ where
             return Some(array);
         }
         None
+    }
+}
+
+fn set_id_for_path(id: i64, path: GString) {
+    let mut resource_uid = ResourceUid::singleton();
+
+    let existing_id = resource_uid.has_id(id);
+
+    if existing_id {
+        resource_uid.add_id(id, path)
+    } else {
+        resource_uid.set_id(id, path)
     }
 }

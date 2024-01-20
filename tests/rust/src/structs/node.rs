@@ -1,4 +1,4 @@
-use godot::{obj::Gd, register::{GodotClass, godot_api}, engine::INode};
+use godot::{obj::{Base, Gd, OnReady}, register::{GodotClass, godot_api}, engine::{INode, ISprite2D, Sprite2D}};
 
 use super::resource::{WithExtGd, WithBundledGd};
 

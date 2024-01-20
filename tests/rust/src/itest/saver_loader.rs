@@ -61,6 +61,15 @@ fn gd_loader_register() {
     }
 }
 
+#[gditest]
+fn load_global() {
+    let loaded_bin = try_load::<TestResource>("res://load_bench/test.gdbin");
+    assert!(loaded_bin.is_ok(), "can't load gdbin resource");
+
+    let loaded_ron = try_load::<TestResource>("res://load_bench/test.gdron");
+    assert!(loaded_ron.is_ok(), "can't load gdron resource");
+}
+
 #[gditest(scene_path="res://dev_test.tscn")]
 fn save_and_load_global() {
     let resource = TestResource::new_random(5, 3);

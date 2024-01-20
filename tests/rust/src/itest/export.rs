@@ -1,7 +1,7 @@
 use gd_rehearse::{CaseContext, itest::gditest};
-use godot::{engine::NodeExt, builtin::{NodePath, GString}};
+use godot::{builtin::{GString, NodePath}, engine::NodeExt, };
 
-use crate::structs::node::ExportTestNode;
+use crate::structs::node::ExportTestNode;   
 
 #[gditest(scene_path="res://export_test.tscn")]
 fn exported_can_retrieve_node(ctx: &CaseContext)

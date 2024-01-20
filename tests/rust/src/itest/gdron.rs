@@ -30,7 +30,7 @@ fn can_save() {
     da.remove(file.into());
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn can_load() {
     let path = "res://load_bench/";
     let file = "test.gdron";
@@ -199,7 +199,7 @@ fn can_save_external() {
     );
 }
 
-#[gditest]
+#[gditest(scene_path="res://dev_test.tscn")]
 fn can_load_external() {
     let path = "res://ext_test/test_ext.gdron";
 
