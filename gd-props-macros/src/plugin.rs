@@ -17,11 +17,10 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
     Ok(quote! {
 
-      use ::gd_props::traits::GdPropExporter as _;
+      use ::gd_props::export::GdPropExporter as _;
       use ::gd_props::traits::GdProp as _;
       use ::godot::engine::IEditorPlugin as _;
       use ::godot::engine::IEditorExportPlugin as _;
-      use ::godot::obj::WithBaseField as _;
 
       #[::godot::register::godot_api]
       impl ::godot::engine::IEditorPlugin for #plugin_ident {
@@ -30,20 +29,36 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
         }
 
         fn enter_tree(&mut self) {
-          self.base_mut()
+          use ::godot::obj::WithBaseField as _;
+
+          <Self as ::godot::obj::WithBaseField>::base_mut(self)
           .add_export_plugin(::godot::obj::Gd::<#exporter>::default().upcast())
         }
 
         fn exit_tree(&mut self) {
-          self.base_mut()
+          use ::godot::obj::WithBaseField as _;
+
+          <Self as ::godot::obj::WithBaseField>::base_mut(self)
           .remove_export_plugin(::godot::obj::Gd::<#exporter>::default().upcast())
         }
       }
 
-      impl ::gd_props::traits::GdPropExporter for #exporter {}
-
       #[::godot::register::godot_api]
       impl ::godot::engine::IEditorExportPlugin for #exporter {
+        fn export_begin(
+          &mut self,
+          features: ::godot::builtin::PackedStringArray,
+          is_debug: bool,
+          path: ::godot::builtin::GString,
+          flags: u32
+        ) {
+          <Self as ::gd_props::export::GdPropExporter>::_int_export_begin(self);
+        }
+
+        fn export_end(&mut self) {
+          <Self as ::gd_props::export::GdPropExporter>::_int_export_end(self);
+        }
+      
         fn get_name(&self) -> ::godot::builtin::GString {
           ::godot::builtin::GString::from(stringify!(#exporter))
         }
@@ -57,8 +72,6 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
           if Self::_int_is_gdron(path.clone()) {
 
-            use ::godot::obj::WithBaseField as _;
-
             let mut bytes: Option<::godot::builtin::PackedByteArray> = None;
 
             let changed_path = Self::_int_ron_to_bin_change_path(path.clone());
@@ -71,7 +84,7 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
             if let Some(bytes) = bytes {
               ::godot::log::godot_print!("Adding resource of {} type, from: {}; Remapped to: {}", &type_, &path, &changed_path);
-              self.base_mut().add_file(changed_path, bytes, true);
+              <Self as ::godot::obj::WithBaseField>::base_mut(self).add_file(changed_path, bytes, true);
             }
 
           } else if Self::_int_is_gdbin(path.clone()) {
@@ -82,7 +95,7 @@ pub fn derive_plugin(decl: Declaration) -> Result<TokenStream, venial::Error> {
 
             if let Some(bytes) = bytes {
               ::godot::log::godot_print!("Adding resource of {} type, from: {}", &type_, &path);
-              self.base_mut().add_file(path.clone(), bytes, false);
+              <Self as ::godot::obj::WithBaseField>::base_mut(self).add_file(path.clone(), bytes, false);
             }
           }
         }

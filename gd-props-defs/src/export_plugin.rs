@@ -4,7 +4,7 @@ use godot::builtin::meta::ClassName;
 use godot::builtin::{GString, PackedByteArray};
 use godot::engine::file_access::ModeFlags;
 use godot::engine::{
-    load, save, try_load, EditorExportPlugin, FileAccess, GFile, IEditorExportPlugin, Object, Resource, ResourceLoader, ResourceSaver, ResourceUid
+    load, save, try_load, DirAccess, EditorExportPlugin, FileAccess, GFile, IEditorExportPlugin, Object, Resource, ResourceLoader, ResourceSaver, ResourceUid
 };
 use godot::log::godot_error;
 use godot::obj::bounds::MemRefCounted;
@@ -23,6 +23,8 @@ where
         + Bounds<Memory = MemRefCounted>
         + GodotDefault,
 {
+    fn _int_remaps(&mut self) -> &mut Vec<RemapData>;
+
     fn _int_ron_to_bin_change_path(path: GString) -> GString {
         let mut stringified = path.to_string();
 
@@ -49,11 +51,13 @@ where
         T: GdProp,
     {
         let mut loader = ResourceLoader::singleton();
-        let uid = loader.get_resource_uid(ron_path.clone());
         let res = loader.load(ron_path.clone()).expect("can't get ron file");
 
-        set_id_for_path(uid, bin_path.clone());
+        let remap_data = RemapData::new(&ron_path, &bin_path);
+        remap_data.transfer_uid();
         save(res, bin_path.clone());
+
+        self._int_remaps().push(remap_data);
 
         FileAccess::get_file_as_bytes(bin_path.clone())
     }
@@ -74,16 +78,54 @@ where
         }
         None
     }
+
+    fn _int_export_begin(&mut self) {
+        self._int_remaps().clear();
+    }
+
+    fn _int_export_end(&mut self) {
+        while let Some(remap) = self._int_remaps().pop() {
+            remap.undo_uid();
+            DirAccess::remove_absolute(remap.bin_path.clone());
+        }
+    }
 }
 
-fn set_id_for_path(id: i64, path: GString) {
-    let mut resource_uid = ResourceUid::singleton();
+pub struct RemapData {
+    ron_path: GString,
+    bin_path: GString,
+    uid: i64,
+}
 
-    let existing_id = resource_uid.has_id(id);
+impl RemapData {
+    pub (crate) fn new(ron_path: &GString, bin_path: &GString) -> Self {
+        let mut loader = ResourceLoader::singleton();
+        let uid = loader.get_resource_uid(ron_path.clone());
 
-    if existing_id {
-        resource_uid.add_id(id, path)
-    } else {
-        resource_uid.set_id(id, path)
+        Self {
+            ron_path: ron_path.clone(),
+            bin_path: bin_path.clone(),
+            uid
+        }
+    }
+
+    pub (crate) fn transfer_uid(&self) {
+        self.change_uid(self.bin_path.clone())
+    }
+
+    pub (crate) fn undo_uid(&self) {
+        self.change_uid(self.ron_path.clone())
+    }
+
+    fn change_uid(&self, path: GString) {
+        let mut resource_uid = ResourceUid::singleton();
+
+        let existing_id = resource_uid.has_id(self.uid);
+    
+        if existing_id {
+            resource_uid.add_id(self.uid, path)
+        } else {
+            resource_uid.set_id(self.uid, path)
+        }
     }
 }

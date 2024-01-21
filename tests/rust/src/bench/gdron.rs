@@ -51,7 +51,7 @@ fn gdron_save() -> bool {
     true
 }
 
-#[gdbench(repeat = 5)]
+#[gdbench(repeat = 5, scene_path="res://dev_test.tscn")]
 fn gdron_load() -> bool {
     let path = "res://load_bench/";
     let file = "test_long.gdron";

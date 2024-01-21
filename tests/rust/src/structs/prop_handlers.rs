@@ -1,5 +1,5 @@
 use super::resource::*;
-use gd_props::{GdPropLoader, GdPropPlugin, GdPropSaver};
+use gd_props::{export::RemapData, export::GdPropExporter, GdPropLoader, GdPropPlugin, GdPropSaver};
 use godot::{
     bind::GodotClass,
     engine::{EditorExportPlugin, EditorPlugin, IEditorPlugin},
@@ -17,16 +17,22 @@ pub struct PropSaver;
 pub struct PropLoader;
 
 #[derive(GodotClass)]
-#[class(init, base=EditorExportPlugin, tool)]
-pub struct PropExporter {
+#[class(init,base = EditorExportPlugin, tool)]
+struct NewPropExporter {
+    remaps: Vec<RemapData>,
     #[base]
     base: Base<EditorExportPlugin>,
+}
+impl GdPropExporter for NewPropExporter {
+    fn _int_remaps(&mut self) -> &mut Vec<RemapData> {
+        &mut self.remaps
+    }
 }
 
 #[derive(GodotClass, GdPropPlugin)]
 #[class(init, tool, editor_plugin, base=EditorPlugin)]
 #[register(TestResource, WithBundledGd, WithExtGd, WithBundleArray)]
-#[exporter(PropExporter)]
+#[exporter(NewPropExporter)]
 pub struct PropPlugin {
     #[base]
     base: Base<EditorPlugin>,
