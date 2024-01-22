@@ -2,9 +2,7 @@ use godot::obj::{Gd, GodotClass, UserClass};
 
 use serde::{Serialize, Serializer};
 
-pub(crate) struct GodotPointerSerWrapper<T: GodotClass + UserClass + Serialize>(
-    Gd<T>,
-);
+pub(crate) struct GodotPointerSerWrapper<T: GodotClass + UserClass + Serialize>(Gd<T>);
 
 impl<T> Serialize for GodotPointerSerWrapper<T>
 where
@@ -139,7 +137,7 @@ pub mod gd_option {
     }
 }
 
-/// Module that can be used to serialize and deserialize rust-defined [`GodotClass`]es on basis of their pointers contained 
+/// Module that can be used to serialize and deserialize rust-defined [`GodotClass`]es on basis of their pointers contained
 /// within [`HashMap`](std::collections::HashMap) as bundled resources.
 ///
 /// Its main use is to derive [`serde::Serialize`] and [`serde::Deserialize`] on resources containing optional pointers

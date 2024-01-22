@@ -1,11 +1,11 @@
-use std::io::{BufReader, BufWriter, Seek};
+use std::io::{BufReader, BufWriter};
 
 use godot::builtin::meta::ToGodot;
 use godot::builtin::{GString, PackedByteArray, Variant};
 use godot::engine::file_access::ModeFlags;
 use godot::engine::global::Error;
 use godot::engine::utilities::randf;
-use godot::engine::{DirAccess, FileAccess, GFile, Resource, ResourceSaver, ResourceUid};
+use godot::engine::{DirAccess, FileAccess, GFile, Resource, ResourceUid};
 use godot::log::godot_error;
 use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 use rmp_serde::Serializer;
@@ -172,11 +172,12 @@ where
     }
 
     fn translate_ron_to_bin(path: GString) -> PackedByteArray {
-        let mut file = GFile::open(path.clone(), ModeFlags::READ).expect("Can't open file"); 
-            
+        let mut file = GFile::open(path.clone(), ModeFlags::READ).expect("Can't open file");
+
         let meta = GdMetaHeader::from_gfile_ron(&mut file).expect("Can't read meta header");
         let bufreader = BufReader::new(file);
-        let obj = ron::de::from_reader::<BufReader<GFile>, Self>(bufreader).expect("Can't read ron file");
+        let obj =
+            ron::de::from_reader::<BufReader<GFile>, Self>(bufreader).expect("Can't read ron file");
 
         let temp_file = TempFile::new();
         let mut temp_gfile = temp_file.open_write_read();
@@ -244,12 +245,13 @@ impl TempFile {
 
         Self {
             dir: "user://".into(),
-            file
+            file,
         }
     }
 
     fn open_write_read(&self) -> GFile {
-        GFile::open(format!("{}{}", self.dir, self.file), ModeFlags::WRITE_READ).expect("Cannot open temporary file write")
+        GFile::open(format!("{}{}", self.dir, self.file), ModeFlags::WRITE_READ)
+            .expect("Cannot open temporary file write")
     }
 
     fn get_file_as_bytes(&self) -> PackedByteArray {
@@ -259,7 +261,8 @@ impl TempFile {
 
 impl Drop for TempFile {
     fn drop(&mut self) {
-        let mut da = DirAccess::open(GString::from(&self.dir)).expect("Cannot open user directory!");
+        let mut da =
+            DirAccess::open(GString::from(&self.dir)).expect("Cannot open user directory!");
         da.remove(GString::from(&self.file));
     }
 }

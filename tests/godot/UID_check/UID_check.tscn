@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://bd78oggrjwl3d"]
+
+[ext_resource type="Script" path="res://UID_check/UID_check.gd" id="1_1h01i"]
+
+[node name="UidCheck" type="Node"]
+script = ExtResource("1_1h01i")
+resource_paths = PackedStringArray("res://export_test/GodotTestResource.tres", "res://export_test/TestResource2.gdron", "res://export_test/TestResource.gdron", "res://export_test/WithBundled.gdron", "res://export_test/WithExt.gdron", "res://ext_test/test_ext.gdron", "res://ext_test/test_godot_res.tres", "res://ext_test/test_resource.gdbin", "res://ext_test/test_resource.gdron", "res://load_bench/test.gdbin", "res://load_bench/test.gdron", "res://load_bench/test_long.gdbin", "res://load_bench/test_long.gdron")

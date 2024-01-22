@@ -102,8 +102,12 @@ impl GdMetaHeader {
     }
 
     pub fn to_gfile_bin(&self, gfile: &mut GFile) {
-        gfile.write_pascal_string(GString::from(&self.gd_class)).expect("cannot write class");
-        gfile.write_pascal_string(GString::from(&self.uid)).expect("cannot write uid");
+        gfile
+            .write_pascal_string(GString::from(&self.gd_class))
+            .expect("cannot write class");
+        gfile
+            .write_pascal_string(GString::from(&self.uid))
+            .expect("cannot write uid");
     }
 }
 

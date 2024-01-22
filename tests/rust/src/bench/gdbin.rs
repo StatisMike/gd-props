@@ -1,13 +1,10 @@
 use gd_rehearse::bench::gdbench;
-use godot::builtin::GString;
-use godot::engine::{IResourceFormatLoader, IResourceFormatSaver};
-use godot::obj::{Gd, NewGd};
+use godot::engine::{load, save};
+use godot::obj::Gd;
 use serde::{Deserialize, Serialize};
 
 use crate::remove_file;
-use crate::structs::prop_handlers::PropLoader;
-// use crate::structs::singleton::GodotSingleton;
-use crate::structs::{prop_handlers::PropSaver, resource::TestResource};
+use crate::structs::resource::TestResource;
 
 #[gdbench(repeat = 10)]
 fn serialize() -> bool {
@@ -33,19 +30,15 @@ fn deserialize() -> bool {
     true
 }
 
-#[gdbench(repeat = 5, scene_path="res://dev_test.tscn")]
+#[gdbench(repeat = 5, scene_path = "res://dev_test.tscn")]
 fn gdbin_save() -> bool {
     let path = "res://";
     let file = "test.gdbin";
     let file_path = &format!("{}{}", path, file);
 
-    let mut saver = PropSaver::new_gd();
-
     let resource = TestResource::new_random(50, 50);
 
-    saver
-        .bind_mut()
-        .save(resource.clone().upcast(), file_path.into(), 0);
+    save(resource, file_path);
 
     remove_file(path, file_path);
     true
@@ -57,11 +50,7 @@ fn gdbin_load() -> bool {
     let file = "test_long.gdbin";
     let file_path = &format!("{}{}", path, file);
 
-    let loader = PropLoader::new_gd();
-
-    loader
-        .bind()
-        .load(file_path.into(), GString::new(), false, 0);
+    load::<TestResource>(file_path);
 
     true
 }

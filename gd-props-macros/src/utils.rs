@@ -1,12 +1,14 @@
+use proc_macro2::TokenStream as TokenStream2;
 use proc_macro2::{Ident, TokenTree};
-use venial::{AttributeValue, Declaration};
+use quote::{format_ident, quote};
+use venial::{AttributeValue, Declaration, Struct};
 
 #[derive(Debug)]
-pub(crate) struct SaverLoaderAttributes {
+pub(crate) struct RegisteredProps {
     pub registers: Vec<proc_macro2::Ident>,
 }
 
-impl SaverLoaderAttributes {
+impl RegisteredProps {
     const REGISTER_PATH: &'static str = "register";
 
     pub fn declare(declaration: &Declaration) -> Result<Self, venial::Error> {
@@ -32,46 +34,53 @@ impl SaverLoaderAttributes {
     }
 }
 
-#[derive(Debug)]
-pub(crate) struct PluginAttributes {
-    pub registers: Vec<proc_macro2::Ident>,
-    pub exporter: proc_macro2::Ident,
+pub(crate) struct VisMarkerHandler {
+    pub marker: TokenStream2,
 }
 
-impl PluginAttributes {
-    const REGISTER_PATH: &'static str = "register";
-    const EXPORTER_PATH: &'static str = "exporter";
+impl VisMarkerHandler {
+    pub fn from_item(item: &Struct) -> Result<Self, venial::Error> {
+        if let Some(vis_marker) = &item.vis_marker {
+            if let Some(restriction) = &vis_marker.tk_token2 {
+                if restriction.to_string() != "(crate)" {
+                    return Err(venial::Error::new_at_span(
+                        restriction.span(),
+                        "visibility restriction must be at most '(crate)'",
+                    ));
+                }
 
-    pub fn declare(declaration: &Declaration) -> Result<Self, venial::Error> {
-        let mut registers = Vec::new();
-        let mut exporter = Option::<Ident>::None;
-
-        let obj = declaration
-            .as_struct()
-            .ok_or_else(|| venial::Error::new("Only struct can be registered!"))?;
-
-        for attr in obj.attributes.iter() {
-            let path = &attr.path;
-            if path.len() == 1 && path[0].to_string() == Self::REGISTER_PATH {
-                let idents = handle_register(&attr.value)?;
-                registers.extend(idents.into_iter());
+                return Ok(Self {
+                    marker: quote! {pub(crate) },
+                });
             }
-            if path.len() == 1 && path[0].to_string() == Self::EXPORTER_PATH {
-                handle_exporter(&attr.value, &mut exporter)?;
-            }
+            return Ok(Self {
+                marker: quote! {pub },
+            });
         }
+        Ok(Self { marker: quote! {} })
+    }
+}
 
-        if registers.is_empty() {
-            return Err(venial::Error::new("Didn't find any `register` tag"));
-        }
-        if exporter.is_none() {
-            return Err(venial::Error::new("Didn't find any `exporter` tag"));
-        }
+pub(crate) struct GdPropIdents {
+    pub plugin: Ident,
+    pub exporter: Ident,
+    pub loader: Ident,
+    pub saver: Ident,
+}
 
-        Ok(Self {
-            registers,
-            exporter: exporter.unwrap(),
-        })
+impl GdPropIdents {
+    pub fn from_item(item: &Struct) -> Self {
+        let plugin = item.name.clone();
+        let exporter = format_ident!("{}{}", &plugin, "Exporter");
+        let loader = format_ident!("{}{}", &plugin, "Loader");
+        let saver = format_ident!("{}{}", &plugin, "Saver");
+
+        Self {
+            plugin,
+            exporter,
+            loader,
+            saver,
+        }
     }
 }
 
@@ -93,26 +102,4 @@ fn handle_register(value: &AttributeValue) -> Result<Vec<Ident>, venial::Error> 
         }
     }
     Ok(idents)
-}
-
-fn handle_exporter(
-    value: &AttributeValue,
-    exporter: &mut Option<Ident>,
-) -> Result<(), venial::Error> {
-    if exporter.is_some() {
-        return Err(venial::Error::new(
-            "Only one 'exporter' attribute can be present",
-        ));
-    }
-    if let AttributeValue::Group(_span, tokens) = &value {
-        if tokens.len() != 1 {
-            return Err(venial::Error::new(
-                "One identifier must be present in `exporter` attribute value",
-            ));
-        }
-        if let TokenTree::Ident(ident) = &tokens[0] {
-            *exporter = Some(ident.clone());
-        }
-    }
-    Ok(())
 }

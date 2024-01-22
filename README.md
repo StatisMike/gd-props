@@ -24,20 +24,18 @@ serialization and deserialization. Resources can be saved in two formats:
 The following features are currently available. More will be listed in the `In Development` section.
 
 - `GdProp` derive macro for custom `Resource`s, making them savable to `.gdron` and `.gdbin` formats.
-- `GdPropSaver` and `GdPropLoader` macros for easily implementing `CustomFormatSaver` and `CustomFormatLoader` for `.gdron` and `.gdbin` formats.
 - `serde_gd` module containing submodules to be used with `serde`, making it easier to implement `Serialize` and `Deserialize` for your 
   custom resources.
+- `gd_props_plugin` macro, which handles:
+  - setting up `ResourceFormatSaver` and `ResourceFormatSaver` to handle `.gdron` and `.gdbin` formats.
+  - setting up `EditorPlugin` and `EditorExportPlugin` to handle export of `.gdron` and `.gdbin` formats.
+    - during export, all `.gdron` files are transformed into `.gdbin`, as the later is more compact and much faster to load. 
 
 ## In Development
 
 > **This crate is not production-ready** ⚠️
 >
 > This crate is early in development, and its API may change. Contributions, discussions, and informed opinions are very welcome.
-
-Features that will certainly be expanded upon:
-
-- Make the `gdron` and `gdbin` formats interchangeable for release mode with a custom `EditorExportPlugin`.
-- Ensure everything works smoothly in compiled games, especially pointers to `.tres` resources after they are changed into `.res` format.
 
 ## GdProp macro
 Consider a scenario where you have a resource with a structure similar to the one below. You might contemplate transforming a `HashMap` 
@@ -217,41 +215,40 @@ Upon saving to `.gdron` format we receive file as below:
 )
 ```
 
-## Custom Format Saving and Loading with `GdProp`
+## GdProp tooling
 
 Now that we have Rust resources fully serializable to `.gdron` and `.gdprop`, the next step is to provide tools for saving and loading 
-them within the Godot engine. The default `ResourceSaver` and `ResourceLoader` are unaware of our `.gdron` files.
+them within the Godot engine. The default `ResourceSaver` and `ResourceLoader` are unaware of our `.gdron` and `.gdbin` files.
 
-`gd-props` introduces two powerful derive macros, `GdPropSaver` and `GdPropLoader`, designed to simplify the creation of `CustomFormatSaver` 
-and `CustomFormatLoader` for formats it introduces. These macros enable the seamless registration of our resources to the Godot engine, 
-ensuring compatibility with the `.gdron` and `.gdbin` formats.
+Also, by default the files won't be included into exported game, and actually we want to have a say in how they should be
+exported.
 
-The syntax for both macros is quite similar:
+To automatically define all tool GodotClass needed to handle introduced formats, the `#[gd_props_plugin]` macro should be used.
+Below example that creates all needed tools and register two `GdProps`-annotated resources to be recognized by them.
+
 ```rust
-// The derive itself
-#[derive(GdPropSaver)]
-// Attribute to register the GdRonResources to be handled by given Saver/Loader
-#[register(CharacterData, Statistics)]
-// Multiple `register` macro attributes could be provided, all identifiers contained within will be registered
-#[register(AnotherGodotResource)]
-```
-Full example - defining both Saver and Loader:
-```rust
-#[derive(GodotClass, GdPropSaver)]
-#[class(base=ResourceFormatSaver, init, tool)]
-#[register(CharacterData, Statistics)]
-pub struct CustomRonSaver {}
+use godot::prelude::*;
+use gd_props::gd_props_plugin;
 
+// Macro creates four different GodotClasses and registers two resources implementing `GdProp`
+#[gd_props_plugin]
+#[register(CharacterData, Statistics)]
+pub(crate) struct PropPlugin;
+ 
+// Plugin and Exporter are only available in-editor for exporting resources.
+assert_eq!(PropPlugin::INIT_LEVEL, InitLevel::Editor);
+assert_eq!(PropPluginExporter::INIT_LEVEL, InitLevel::Editor);
 
-#[derive(GodotClass, GdPropLoader)]
-#[class(base=ResourceFormatLoader, init, tool)]
-#[register(CharacterData)]
-#[register(Statistics)]
-pub struct CustomPropLoader {}
+// Loader and Saver are available in scenes for loading/saving registered resources.
+assert_eq!(PropPluginSaver::INIT_LEVEL, InitLevel::Scene);
+assert_eq!(PropPluginLoader::INIT_LEVEL, InitLevel::Scene);
 ```
-All that is left for Godot Editor to use our new `ResourceFormatSaver` and `ResourceFormatLoader` is to register them upon loading out 
-`gdextension` to Godot's `ResourceSaver` and `ResourceLoader`, respectively. It can be achieved with provided associated methods
+
+### Custom Format Saving and Loading with `GdProp`
+
+After above, all that is left for Godot Editor to use our new `ResourceFormatSaver` and `ResourceFormatLoader` is to register them upon loading out `gdextension` to Godot's `ResourceSaver` and `ResourceLoader`, respectively. It can be achieved with provided associated methods
 in `GdPropSaver` and `GdPropLoader` traits.
+
 ```rust
 // lib.rs
 use godot_io::traits::{GdPropLoader, GdPropSaver};
@@ -262,9 +259,66 @@ struct MyExtension;
 unsafe impl ExtensionLibrary for MyExtension {
     fn on_level_init(_level: InitLevel) {
         if _level == InitLevel::Scene {
-            CustomPropLoader::register_loader();
-            CustomPropSaver::register_saver();
+            PropPluginLoader::register_loader();
+            PropPluginSaver::register_saver();
         }
+    }
+    // And we need to unregister them when editor is closing!
+    fn on_level_deinit(deinit: InitLevel) {
+       if deinit == InitLevel::Scene {
+           PropPluginLoader::unregister_loader();
+           PropPluginSaver::unregister_saver();
+       }
     }
 }
 ```
+
+### Custom format export
+
+Contrary to Loader and Saver, just a definition of `EditorPlugin` GodotClass is enough to handle the resources
+on export and no extra steps are needed. Besides adding the custom format resources into the exported executable, 
+all resources in `.gdron` format will be translated into `.gdbin`, as main reason for the former (being human-readible)
+isn't needed anymore, and the later is more concise and faster to load. 
+
+As comparison from `gd-rehearse` run shows, the difference is meaningiful, so currently there is no way
+to opt-out of the conversion.
+
+On debug (both Godot and Rust) build, where resources with paths ending with `.gdron` are saved/loaded as `.gdron` files.
+
+```
+--------------------------------------------------------------------------------
+   Running Rust benchmarks
+--------------------------------------------------------------------------------
+                                              min       median
+   gdbin.rs:
+   -- serialize                  ...     27.260μs     29.396μs
+   -- deserialize                ...     73.402μs     73.855μs
+   -- gdbin_save                 ...    350.893μs    360.174μs
+   -- gdbin_load                 ...    228.172μs    230.172μs
+
+   gdron.rs:
+   -- serialize                  ...     37.871μs     40.088μs
+   -- deserialize                ...     82.897μs     83.356μs
+   -- gdron_save                 ...    492.388μs    502.603μs
+   -- gdron_load                 ...    979.330μs    988.216μs
+```
+
+On release (both Godot and Rust) build, where resources with paths ending with `.gdron` are remapped to `.gdbin`, the 
+times are similiar for both formats: slightly higher times on `gdron` are probably caused by Godot's remap system.
+
+> Saving was omitted, as the `res://` path is unavailable while exported
+
+```
+--------------------------------------------------------------------------------
+   Running Rust benchmarks
+--------------------------------------------------------------------------------
+                                              min       median
+   gdbin.rs:
+   -- serialize                  ...      3.853μs      5.548μs
+   -- deserialize                ...      7.514μs      9.500μs
+   -- gdbin_load                 ...    120.190μs    177.116μs
+
+   gdron.rs:
+   -- serialize                  ...      5.105μs      6.051μs
+   -- deserialize                ...      7.113μs      8.318μs
+   -- gdron_load                 ...    140.451μs    205.902μs
