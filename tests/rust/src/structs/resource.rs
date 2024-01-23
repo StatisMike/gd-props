@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use gd_props::GdProp;
 
-use godot::builtin::{GString, Array};
+use godot::builtin::{Array, GString};
 use godot::engine::{IResource, ResourceSaver};
 use godot::obj::Gd;
 use godot::prelude::{godot_api, GodotClass};
@@ -38,7 +38,7 @@ pub struct TestResource {
 
 #[godot_api]
 impl TestResource {
-    pub(crate) fn new_random(hash_count: u32, vec_count: u32) -> Gd<Self> {
+    pub fn new_random(hash_count: u32, vec_count: u32) -> Gd<Self> {
         let mut rng = rand::thread_rng();
 
         let mut set = HashSet::new();
@@ -55,15 +55,15 @@ impl TestResource {
         Gd::<Self>::from_object(Self { set, vec })
     }
 
-    pub(crate) fn get_set(&self) -> &HashSet<InnerThing> {
+    pub fn get_set(&self) -> &HashSet<InnerThing> {
         &self.set
     }
 
-    pub(crate) fn get_vec(&self) -> &Vec<InnerThing> {
+    pub fn get_vec(&self) -> &Vec<InnerThing> {
         &self.vec
     }
 
-    pub(crate) fn check_set_eq(first: &HashSet<InnerThing>, other: &HashSet<InnerThing>) -> bool {
+    pub fn check_set_eq(first: &HashSet<InnerThing>, other: &HashSet<InnerThing>) -> bool {
         let mut first_set = first.clone();
         let mut second_set = other.clone();
 
@@ -74,7 +74,7 @@ impl TestResource {
         first_set.is_empty()
     }
 
-    pub(crate) fn check_vec_eq(first: &[InnerThing], other: &[InnerThing]) -> bool {
+    pub fn check_vec_eq(first: &[InnerThing], other: &[InnerThing]) -> bool {
         let mut eq_count = 0;
         let mut second = other.iter().collect::<Vec<_>>();
 
@@ -100,7 +100,7 @@ impl GodotSingleton for TestResource {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource)]
-pub(crate) struct WithBundledGd {
+pub struct WithBundledGd {
     #[export]
     #[serde(with = "gd_props::serde_gd::gd")]
     pub first: Gd<TestResource>,
@@ -110,7 +110,7 @@ pub(crate) struct WithBundledGd {
 }
 
 impl WithBundledGd {
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         Self {
             first: TestResource::new_random(3, 4),
             second: Some(TestResource::new_random(5, 2)),
@@ -127,7 +127,7 @@ impl IResource for WithBundledGd {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithBundleHashMap {
+pub struct WithBundleHashMap {
     #[serde(with = "gd_props::serde_gd::gd_hashmap")]
     pub map: HashMap<i32, Gd<TestResource>>,
 }
@@ -152,7 +152,7 @@ impl WithBundleHashMap {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithBundleArray {
+pub struct WithBundleArray {
     #[export]
     #[serde(with = "gd_props::serde_gd::gd_array")]
     pub array: Array<Gd<TestResource>>,
@@ -178,11 +178,11 @@ impl WithBundleArray {
 
 #[derive(GodotClass)]
 #[class(base=Resource)]
-pub(crate) struct TestGodotResource {
+pub struct TestGodotResource {
     #[export]
-    pub(crate) int: i32,
+    pub int: i32,
     #[export]
-    pub(crate) str: GString,
+    pub str: GString,
 }
 
 impl TestGodotResource {
@@ -218,7 +218,7 @@ impl IResource for TestGodotResource {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithExtGd {
+pub struct WithExtGd {
     #[export]
     #[serde(with = "gd_props::serde_gd::ext")]
     pub first: Gd<TestResource>,
@@ -229,14 +229,14 @@ pub(crate) struct WithExtGd {
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithExtArray {
+pub struct WithExtArray {
     #[serde(with = "gd_props::serde_gd::ext_array")]
     pub vec: Array<Gd<TestGodotResource>>,
 }
 
 #[derive(GodotClass, Serialize, Deserialize, GdProp)]
 #[class(base=Resource, init)]
-pub(crate) struct WithExtHashMap {
+pub struct WithExtHashMap {
     #[serde(with = "gd_props::serde_gd::ext_hashmap")]
     pub map: HashMap<String, Gd<TestGodotResource>>,
 }

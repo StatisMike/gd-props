@@ -1,13 +1,6 @@
 use super::resource::*;
-use gd_props::{GdPropLoader, GdPropSaver};
-use godot::bind::GodotClass;
+use gd_props::gd_props_plugin;
 
-#[derive(GodotClass, GdPropSaver)]
-#[class(init, base = ResourceFormatSaver, tool)]
+#[gd_props_plugin]
 #[register(TestResource, WithBundledGd, WithExtGd, WithBundleArray)]
-pub struct PropSaver;
-
-#[derive(GodotClass, GdPropLoader)]
-#[class(init, base = ResourceFormatLoader, tool)]
-#[register(TestResource, WithBundledGd, WithExtGd, WithBundleArray)]
-pub struct PropLoader;
+pub(crate) struct PropPlugin;

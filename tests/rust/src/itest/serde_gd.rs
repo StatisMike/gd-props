@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::io::BufWriter;
 
 use gd_rehearse::itest::gditest;
-use godot::builtin::{GString, Array};
+use godot::builtin::{Array, GString};
 use godot::engine::ResourceLoader;
 use godot::obj::Gd;
 
@@ -144,7 +144,7 @@ fn serde_external() {
     );
 }
 
-#[gditest]
+#[gditest(scene_path = "res://dev_test.tscn")]
 fn serde_external_array() {
     let path = "res://";
     let subresources = TestGodotResource::new_saved_multiple(path, 5);
@@ -169,7 +169,7 @@ fn serde_external_array() {
 
     for subresource in deserialized.vec.iter_shared() {
         let res_path = subresource.get_path().to_string();
-        let trimmed = res_path.trim_start_matches(path.clone());
+        let trimmed = res_path.trim_start_matches(path);
         deserialized_hash.insert(trimmed.to_owned(), subresource.clone());
     }
 
@@ -183,7 +183,7 @@ fn serde_external_array() {
     }
 }
 
-#[gditest]
+#[gditest(scene_path = "res://dev_test.tscn")]
 fn serde_external_hashmap() {
     let path = "res://";
     let subresources = TestGodotResource::new_saved_multiple(path, 5);

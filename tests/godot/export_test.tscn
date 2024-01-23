@@ -1,0 +1,10 @@
+[gd_scene load_steps=3 format=3 uid="uid://ds8ltyn80xdky"]
+
+[ext_resource type="WithBundledGd" uid="uid://cpwwexxfr5fom" path="res://export_test/WithBundled.gdron" id="1_aqu6x"]
+[ext_resource type="WithExtGd" uid="uid://dajlo5ehfwqfd" path="res://export_test/WithExt.gdron" id="2_qkjas"]
+
+[node name="ExportTest" type="GdTestRunner"]
+
+[node name="ExportTestNode" type="ExportTestNode" parent="."]
+bundle_res = ExtResource("1_aqu6x")
+ext_res = ExtResource("2_qkjas")

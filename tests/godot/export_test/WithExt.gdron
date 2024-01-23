@@ -1,0 +1,13 @@
+(gd_class:"WithExtGd",uid:"uid://dajlo5ehfwqfd")
+(
+    first: ExtResource((
+        gd_class: "TestResource",
+        uid: "uid://cnfnl5d1um4c5",
+        path: "res://export_test/TestResource2.gdron",
+    )),
+    second: ExtResource((
+        gd_class: "TestGodotResource",
+        uid: "uid://b3sv1ikbgbhen",
+        path: "res://export_test/GodotTestResource.tres",
+    )),
+)

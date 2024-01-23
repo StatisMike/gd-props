@@ -2,17 +2,16 @@ use godot::builtin::meta::ToGodot;
 use godot::builtin::{GString, PackedStringArray, Variant};
 use godot::engine::global::Error;
 use godot::engine::{
-    Engine, IResourceFormatLoader, IResourceFormatSaver, Object, ResourceFormatLoader,
-    ResourceFormatSaver, ResourceUid,
+    IResourceFormatLoader, IResourceFormatSaver, ResourceFormatLoader, ResourceFormatSaver,
+    ResourceUid,
 };
 use godot::log::{godot_error, godot_warn};
-use godot::obj::bounds::MemRefCounted;
-use godot::obj::cap::GodotDefault;
-use godot::obj::{Gd, GodotClass, Inherits, UserClass, Bounds};
+use godot::obj::{Gd, GodotClass, Inherits, UserClass};
 
 use crate::errors::GdPropError;
 use crate::gd_meta::GdMetaHeader;
 use crate::gdprop::GdProp;
+use crate::utils::RefCountedSingleton;
 
 #[derive(PartialEq, Eq, Copy, Clone)]
 pub(crate) enum GdPropFormat {
@@ -23,6 +22,15 @@ pub(crate) enum GdPropFormat {
 
 impl GdPropFormat {
     const SUPPORTED_EXTENSIONS: [&'static str; 2] = ["gdbin", "gdron"];
+
+    // pub(crate) fn verify_supported_extensions(extensions: &PackedStringArray) -> bool {
+    //     for extension in Self::get_supported_extensions().as_slice() {
+    //         if !extensions.as_slice().contains(extension) {
+    //             return false;
+    //         }
+    //     }
+    //     true
+    // }
 
     pub(crate) fn get_supported_extensions() -> PackedStringArray {
         PackedStringArray::from(&[
@@ -54,75 +62,62 @@ pub trait GdPropLoader
 where
     Self: GodotClass
         + UserClass
-        + Bounds<Memory = MemRefCounted>
         + Inherits<ResourceFormatLoader>
-        + Inherits<Object>
         + IResourceFormatLoader
-        + GodotDefault,
+        + RefCountedSingleton,
 {
-    /// Name under which the object registers in Godot as a singleton.
-    const SINGLETON_NAME: &'static str;
-
-    /// Associated function to retrieve the pointer to object singleton.
-    fn loader_singleton() -> Gd<Self> {
-        let mut engine = Engine::singleton();
-        // Need to check explicitly to not cause Godot error.
-        let engine_has_singleton = engine.has_singleton(Self::SINGLETON_NAME.into());
-
-        if engine_has_singleton {
-            engine
-                .get_singleton(Self::SINGLETON_NAME.into())
-                .unwrap()
-                .cast()
-        } else {
-            let object = Gd::<Self>::default();
-            engine.register_singleton(Self::SINGLETON_NAME.into(), object.clone().upcast());
-            std::mem::forget(object);
-            engine
-                .get_singleton(Self::SINGLETON_NAME.into())
-                .expect("no singleton found")
-                .cast()
-        }
-    }
-
     /// Associated function to register the created [ResourceFormatLoader] in Godot's [ResourceLoader](godot::engine::ResourceLoader).
-    /// To be used in [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation.
+    /// To be used in [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation in `on_level_init()` function, as shown
+    /// in example below. Unregistering function [`GdPropLoader::unregister_loader`] should be used in conjuction, in `on_level_deinit()` function
+    /// to prevent memory leaks.  
     ///
     /// ## Example
     /// ```no_run
     /// # mod loader {
-    /// #   use gd_props::{GdPropLoader, GdProp};
+    /// #   use gd_props::{GdProp, gd_props_plugin};
     /// #   use godot::prelude::GodotClass;
-    /// #   use godot::engine::ResourceFormatLoader;
+    /// #   use godot::engine::ResourceFormatSaver;
     /// #   use serde::{Serialize, Deserialize};
     /// #   #[derive(GodotClass, GdProp, Serialize, Deserialize)]
     /// #   #[class(init, base=Resource)]
     /// #   pub struct MyResource;
-    /// #   #[derive(GodotClass, GdPropLoader)]
+    /// #   #[gd_props_plugin]
     /// #   #[register(MyResource)]
-    /// #   #[class(tool, init, base=ResourceFormatLoader)]
-    /// #   pub struct MyResLoader;
+    /// #   pub struct MyResPlugin;
     /// # }
     /// # use loader::*;
     ///
     /// use godot::init::*;
+    /// use gd_props::traits::GdPropLoader;
     ///
     /// struct MyGdExtension;
     ///
     /// unsafe impl ExtensionLibrary for MyGdExtension {
     ///     fn on_level_init(_level: InitLevel) {
-    ///         use gd_props::traits::GdPropLoader as _;
     ///         if _level == InitLevel::Scene {
-    ///             MyResLoader::register_loader();
+    ///             MyResPluginLoader::register_loader();
     ///         }   
+    ///     }
+    ///     fn on_level_deinit(deinit: InitLevel) {
+    ///         if deinit == InitLevel::Scene {
+    ///             MyResPluginLoader::unregister_loader();
+    ///         }
     ///     }
     /// }
     /// ```
-
     fn register_loader() {
-        let instance = Self::loader_singleton();
+        let instance = Self::singleton_refcount();
         let loader = &mut godot::engine::ResourceLoader::singleton();
         loader.add_resource_format_loader(instance.upcast());
+    }
+
+    /// Associated function to unregister the [`ResourceFormatLoader`] from Godot's [`ResourceLoader`](godot::engine::ResourceLoader).
+    /// See details and example of usage in [`GdPropLoader::register_loader`] documentation.
+    fn unregister_loader() {
+        let instance = Self::singleton_refcount();
+        let loader = &mut godot::engine::ResourceLoader::singleton();
+        loader.remove_resource_format_loader(instance.upcast());
+        Self::free_singleton();
     }
 
     #[doc(hidden)]
@@ -188,75 +183,62 @@ where
 pub trait GdPropSaver
 where
     Self: GodotClass
-        + Bounds<Memory = MemRefCounted>
+        + UserClass
         + Inherits<ResourceFormatSaver>
-        + Inherits<Object>
         + IResourceFormatSaver
-        + GodotDefault,
+        + RefCountedSingleton,
 {
-    /// Name under which the object registers in Godot as a singleton
-    const SINGLETON_NAME: &'static str;
-
-    /// Associated function to retrieve the pointer to object singleton
-    /// as [Gd]<[ResourceFormatSaver]>.
-    fn saver_singleton() -> Gd<Self> {
-        let mut engine = Engine::singleton();
-        // Need to check explicitly to not cause Godot error.
-        let engine_has_singleton = engine.has_singleton(Self::SINGLETON_NAME.into());
-
-        if engine_has_singleton {
-            engine
-                .get_singleton(Self::SINGLETON_NAME.into())
-                .unwrap()
-                .cast()
-        } else {
-            let object = Gd::<Self>::default();
-            engine.register_singleton(Self::SINGLETON_NAME.into(), object.clone().upcast());
-            std::mem::forget(object);
-            engine
-                .get_singleton(Self::SINGLETON_NAME.into())
-                .expect("no singleton found")
-                .cast()
-        }
-    }
-
     /// Associated function to register the created [ResourceFormatSaver] in Godot's [ResourceSaver](godot::engine::ResourceSaver).
-    /// Recommended to use in [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation.
+    /// Recommended to use in [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation, in `on_level_init()` function, as shown
+    /// in example below. Unregistering function [`GdPropSaver::unregister_saver`] should be used in conjuction, in `on_level_deinit()` function
+    /// to prevent memory leaks.  
     ///
     /// ## Example
     /// ```no_run
     /// # mod saver {
-    /// #   use gd_props::{GdPropSaver, GdProp};
+    /// #   use gd_props::{GdProp, gd_props_plugin};
     /// #   use godot::prelude::GodotClass;
     /// #   use godot::engine::ResourceFormatSaver;
     /// #   use serde::{Serialize, Deserialize};
     /// #   #[derive(GodotClass, GdProp, Serialize, Deserialize)]
     /// #   #[class(init, base=Resource)]
     /// #   pub struct MyResource;
-    /// #   #[derive(GodotClass, GdPropSaver)]
+    /// #   #[gd_props_plugin]
     /// #   #[register(MyResource)]
-    /// #   #[class(tool, init, base=ResourceFormatSaver)]
-    /// #   pub struct MyResSaver;
+    /// #   pub struct MyResPlugin;
     /// # }
     /// # use saver::*;
     ///
     /// use godot::init::*;
-    ///
+    /// use gd_props::traits::GdPropSaver;
     /// struct MyGdExtension;
     ///
     /// unsafe impl ExtensionLibrary for MyGdExtension {
     ///     fn on_level_init(_level: InitLevel) {
-    ///         use gd_props::traits::GdPropSaver as _;
     ///         if _level == InitLevel::Scene {
-    ///             MyResSaver::register_saver();
+    ///             MyResPluginSaver::register_saver();
+    ///         }   
+    ///     }
+    ///     fn on_level_deinit(deinit: InitLevel) {
+    ///         if deinit == InitLevel::Scene {
+    ///             MyResPluginSaver::unregister_saver();
     ///         }   
     ///     }
     /// }
     /// ```
     fn register_saver() {
-        let instance = Self::saver_singleton();
+        let instance = Self::singleton_refcount();
         let saver = &mut godot::engine::ResourceSaver::singleton();
         saver.add_resource_format_saver(instance.upcast::<ResourceFormatSaver>());
+    }
+
+    /// Associated function to unregister the [`ResourceFormatSaver`] from Godot's [`ResourceSaver`](godot::engine::ResourceSaver).
+    /// See details and example of usage in [`GdPropSaver::register_saver`] documentation.
+    fn unregister_saver() {
+        let instance = Self::singleton_refcount();
+        let saver = &mut godot::engine::ResourceSaver::singleton();
+        saver.remove_resource_format_saver(instance.upcast());
+        Self::free_singleton();
     }
 
     #[doc(hidden)]

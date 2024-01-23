@@ -1,4 +1,8 @@
+pub use gd_rehearse::GdTestRunner;
 use godot::{builtin::GString, engine::DirAccess, init::*};
+use rand::Rng;
+
+use crate::structs::prop_handlers::{PropPluginLoader, PropPluginSaver};
 
 mod bench;
 mod itest;
@@ -15,10 +19,6 @@ fn remove_file(path: impl Into<GString>, file_name: impl Into<GString>) {
 }
 
 struct GodotIoTests;
-pub use gd_rehearse::GdTestRunner;
-use rand::Rng;
-use structs::prop_handlers::{PropLoader, PropSaver};
-
 // use crate::structs::{resource::TestResource, singleton::GodotSingleton};
 
 #[gdextension(entry_point=tests_init)]
@@ -27,9 +27,18 @@ unsafe impl ExtensionLibrary for GodotIoTests {
         if init == InitLevel::Scene {
             use gd_props::traits::GdPropLoader as _;
             use gd_props::traits::GdPropSaver as _;
-            PropSaver::register_saver();
-            PropLoader::register_loader();
+            PropPluginSaver::register_saver();
+            PropPluginLoader::register_loader();
             // _ = TestResource::singleton();
+        }
+    }
+
+    fn on_level_deinit(deinit: InitLevel) {
+        if deinit == InitLevel::Scene {
+            use gd_props::traits::GdPropLoader as _;
+            use gd_props::traits::GdPropSaver as _;
+            PropPluginSaver::unregister_saver();
+            PropPluginLoader::unregister_loader();
         }
     }
 }

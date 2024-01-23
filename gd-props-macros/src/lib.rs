@@ -1,6 +1,7 @@
 use crate::translate::translate;
 use proc_macro::{self, TokenStream};
 
+pub(crate) mod main_attribute;
 pub(crate) mod gdprop;
 pub(crate) mod translate;
 pub(crate) mod utils;
@@ -25,23 +26,39 @@ pub fn derive_gd_resource(input: TokenStream) -> TokenStream {
     translate(input, gdprop::derive_resource)
 }
 
-/// Create resource loader for [GdProp](gd_props_defs::traits::GdProp) resources.
-///
-/// Macro used to implement [GdPropLoader](gd_props_defs::traits::GdPropLoader) trait for a bare rust-defined
-/// [ResourceFormatLoader](godot::engine::ResourceFormatLoader), allowing registered resources deriving [GdProp] to be
-/// loaded with it from `.gdron` and `.gdbin` files.
-///
-/// Alongside implementing above trait, macro also implements [IResourceFormatLoader](godot::engine::IResourceFormatLoader),
-/// so you can't implement it yourself.
-///
-/// ## Macro attributes
-/// - `#[register(MyGdPropource, MyOtherGdPropource)]` - registers `Resource`s  deriving [GdProp] to be handled by this
-/// struct. You can provide multiple resource  in one attribute, you can also add multiple `register` attributes with
-/// resources.
-///
+/// Implement GodotClasses necessary for `.gdbin` and `.gdron` files handling within Godot
+/// 
+/// This single macro is used to implement four different, intertwined [`GodotClass`](godot::obj::GodotClass)
+/// structs with all necessary implementations:
+/// 
+/// - [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) and [`ResourceFormatSaver`](godot::engine::ResourceFormatSaver): used to 
+/// load and save [`GdProp`]-deriving resources to `.gdbin` and `.gdron` formats,
+/// - [`EditorPlugin`](godot::engine::EditorPlugin) and [`EditorExportPlugin`](godot::engine::EditorExportPlugin) which handle
+/// exporting `.gdbin` and `.gdron` format files. `.gdron` files are transformed into more compact and faster `.gdbin` format
+/// during export.
+/// 
+/// Identifiers will be generated based on provided struct `Identifier`, with the visibility marker provided, either `pub` or `pub(crate)`:
+/// - `EditorPlugin`: `Identifier`,
+/// - `EditorExportPlugin`: `IdentifierExporter`,
+/// - `ResourceFormatSaver`: `IdentifierSaver`,
+/// - `ResourceFormatLoader`: `IdentifierLoader`.
+/// 
+/// ## Register [`GdProp`] resources
+/// Every resource that should be saveable/loadable/exportable as `.gdbin`/`.gdron` file needs to be provided in helper
+/// `#[register]` macro attribute, as seen in example below. Multiple `#[register]` helper macros with different identifiers can be provided 
+/// for code readability.
+/// 
+/// ## Setup
+/// Created plugins don't need further setup: as they are created, they will be registered and used by `Godot` automatically
+/// during export.
+/// 
+/// Loader and Saver need registering in your [`#[gdextension]`](godot::init::gdextension) implementation. It is recommended to
+/// use provided associated functions: [`register_saver`](gd_props_defs::traits::GdPropSaver::register_saver) and 
+/// [`register_loader`](gd_props_defs::traits::GdPropLoader::register_loader) - for implementation details see their documentation.
+/// 
 /// ## Example
-/// ```no_run
-/// # mod resource {
+/// ```
+/// # mod resources {
 /// #   use gd_props::GdProp;
 /// #   use godot::prelude::GodotClass;
 /// #   use serde::{Serialize, Deserialize};
@@ -52,131 +69,24 @@ pub fn derive_gd_resource(input: TokenStream) -> TokenStream {
 /// #   #[class(init, base=Resource)]
 /// #   pub struct MyOtherResource;
 /// # }
-/// # use resource::*;
-/// use godot::prelude::GodotClass;
-/// use gd_props::GdPropLoader;
-///
-/// #[derive(GodotClass, GdPropLoader)]
-/// #[class(init, tool, base=ResourceFormatLoader)]
+/// # use resources::*;
+/// use godot::prelude::*;
+/// use gd_props::gd_props_plugin;
+/// 
+/// // Macro creates four different GodotClasses and registers two resources implementing `GdProp`
+/// #[gd_props_plugin]
 /// #[register(MyResource, MyOtherResource)]
-/// pub struct MyRonLoader {}
-/// ```
-///
-/// ## Register your `GdPropLoader`
-///
-/// To make the Loader recognizable by editor, remember to add `tool` value to the `GodotClass` macro `#[class]` attribute.
-/// Additionally, you need to register the loader in the [ResourceLoader](godot::engine::ResourceLoader)
-/// singleton at Godot runtime initialization. Recommended way of registration is to call `GdPropourceLoader::register_loader()` associated
-/// function in [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation:
-///
-/// ```no_run
-/// # mod loader {
-/// #   use gd_props::{GdPropLoader, GdProp};
-/// #   use godot::prelude::GodotClass;
-/// #   use godot::engine::ResourceFormatLoader;
-/// #   use serde::{Serialize, Deserialize};
-/// #   #[derive(GodotClass, GdProp, Serialize, Deserialize)]
-/// #   #[class(init, base=Resource)]
-/// #   pub struct MyResource;
-/// #   #[derive(GodotClass, GdPropLoader)]
-/// #   #[register(MyResource)]
-/// #   #[class(tool, init, base=ResourceFormatLoader)]
-/// #   pub struct MyResLoader;
-/// # }
-/// # use loader::*;
-///
-/// use godot::init::*;
-///
-/// struct MyGdExtension;
-///
-/// unsafe impl ExtensionLibrary for MyGdExtension {
-///     fn on_level_init(_level: InitLevel) {
-///         use gd_props::traits::GdPropLoader as _;
-///         if _level == InitLevel::Scene {
-///             MyResLoader::register_loader();
-///         }   
-///     }
-/// }
-/// ```
-#[proc_macro_derive(GdPropLoader, attributes(register))]
-pub fn derive_gd_loader(input: TokenStream) -> TokenStream {
-    translate(input, gdprop::derive_loader)
-}
-
-/// Create resource saver for [GdProp](gd_props_defs::traits::GdProp) resources.
-///
-/// Macro used to implement [GdPropSaver](gd_props_defs::traits::GdPropSaver) trait for a bare rust-defined
-/// [ResourceFormatSaver](godot::engine::ResourceFormatSaver), allowing registered resources deriving [GdProp] to be
-/// saved using it to `.gdron` and `.gdbin` files.
-///
-/// Alongside implementing above trait, macro also implements [IResourceFormatSaver](godot::engine::IResourceFormatSaver),
-/// so you can't implement it yourself.
-///
-/// ## Macro attributes
-/// - `#[register(MyGdPropource, MyOtherGdPropource)]` - registers `Resource`s  deriving [GdProp] to be handled by this
-/// struct. You can provide multiple resource  in one attribute, you can also add multiple `register` attributes with
-/// resources.
-///
-/// ## Example
-/// ```no_run
-/// # mod resource {
-/// #   use gd_props::GdProp;
-/// #   use godot::prelude::GodotClass;
-/// #   use serde::{Serialize, Deserialize};
-/// #   #[derive(GodotClass, GdProp, Serialize, Deserialize)]
-/// #   #[class(init, base=Resource)]
-/// #   pub struct MyResource;
-/// #   #[derive(GodotClass, GdProp, Serialize, Deserialize)]
-/// #   #[class(init, base=Resource)]
-/// #   pub struct MyOtherResource;
-/// # }
-/// # use resource::*;
-/// use godot::prelude::GodotClass;
-/// use gd_props::GdPropSaver;
-///
-/// #[derive(GodotClass, GdPropSaver)]
-/// #[class(init, tool, base=ResourceFormatSaver)]
-/// #[register(MyResource, MyOtherResource)]
-/// pub struct MyRonSaver {}
-/// ```
-///
-/// ## Register your `GdPropSaver`
-///
-/// To make the Saver recognizable by editor, remember to add `tool` value to the `GodotClass` macro `#[class]` attribute.
-/// Additionally, you need to register the saver in the [ResourceSaver](godot::engine::ResourceSaver)
-/// singleton at Godot runtime initialization. Recommended way of registration is to call `GdPropourceSaver::register_saver()` associated
-/// function in [ExtensionLibrary](godot::prelude::ExtensionLibrary) implementation:
-///
-/// ```no_run
-/// # mod saver {
-/// #   use gd_props::{GdPropSaver, GdProp};
-/// #   use godot::prelude::GodotClass;
-/// #   use godot::engine::ResourceFormatSaver;
-/// #   use serde::{Serialize, Deserialize};
-/// #   #[derive(GodotClass, GdProp, Serialize, Deserialize)]
-/// #   #[class(init, base=Resource)]
-/// #   pub struct MyResource;
-/// #   #[derive(GodotClass, GdPropSaver)]
-/// #   #[register(MyResource)]
-/// #   #[class(tool, init, base=ResourceFormatSaver)]
-/// #   pub struct MyResSaver;
-/// # }
-/// # use saver::*;
-///
-/// use godot::init::*;
-///
-/// struct MyGdExtension;
-///
-/// unsafe impl ExtensionLibrary for MyGdExtension {
-///     fn on_level_init(_level: InitLevel) {
-///         use gd_props::traits::GdPropSaver as _;
-///         if _level == InitLevel::Scene {
-///             MyResSaver::register_saver();
-///         }   
-///     }
-/// }
-/// ```
-#[proc_macro_derive(GdPropSaver, attributes(register))]
-pub fn derive_gd_saver(input: TokenStream) -> TokenStream {
-    translate(input, gdprop::derive_saver)
+/// pub(crate) struct MyPropPlugin;
+/// 
+/// // Plugin and Exporter are only available in-editor for exporting resources.
+/// assert_eq!(MyPropPlugin::INIT_LEVEL, InitLevel::Editor);
+/// assert_eq!(MyPropPluginExporter::INIT_LEVEL, InitLevel::Editor);
+/// 
+/// // Loader and Saver are available in scenes for loading/saving registered resources.
+/// assert_eq!(MyPropPluginSaver::INIT_LEVEL, InitLevel::Scene);
+/// assert_eq!(MyPropPluginLoader::INIT_LEVEL, InitLevel::Scene);
+/// 
+#[proc_macro_attribute]
+pub fn gd_props_plugin(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    translate(input, main_attribute::gd_plugin_parser)
 }

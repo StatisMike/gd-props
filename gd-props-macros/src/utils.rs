@@ -1,12 +1,14 @@
+use proc_macro2::TokenStream as TokenStream2;
 use proc_macro2::{Ident, TokenTree};
-use venial::{AttributeValue, Declaration};
+use quote::{format_ident, quote};
+use venial::{AttributeValue, Declaration, Struct};
 
 #[derive(Debug)]
-pub(crate) struct SaverLoaderAttributes {
+pub(crate) struct RegisteredProps {
     pub registers: Vec<proc_macro2::Ident>,
 }
 
-impl SaverLoaderAttributes {
+impl RegisteredProps {
     const REGISTER_PATH: &'static str = "register";
 
     pub fn declare(declaration: &Declaration) -> Result<Self, venial::Error> {
@@ -29,6 +31,56 @@ impl SaverLoaderAttributes {
         }
 
         Ok(Self { registers })
+    }
+}
+
+pub(crate) struct VisMarkerHandler {
+    pub marker: TokenStream2,
+}
+
+impl VisMarkerHandler {
+    pub fn from_item(item: &Struct) -> Result<Self, venial::Error> {
+        if let Some(vis_marker) = &item.vis_marker {
+            if let Some(restriction) = &vis_marker.tk_token2 {
+                if restriction.to_string() != "(crate)" {
+                    return Err(venial::Error::new_at_span(
+                        restriction.span(),
+                        "visibility restriction must be at most '(crate)'",
+                    ));
+                }
+
+                return Ok(Self {
+                    marker: quote! {pub(crate) },
+                });
+            }
+            return Ok(Self {
+                marker: quote! {pub },
+            });
+        }
+        Ok(Self { marker: quote! {} })
+    }
+}
+
+pub(crate) struct GdPropIdents {
+    pub plugin: Ident,
+    pub exporter: Ident,
+    pub loader: Ident,
+    pub saver: Ident,
+}
+
+impl GdPropIdents {
+    pub fn from_item(item: &Struct) -> Self {
+        let plugin = item.name.clone();
+        let exporter = format_ident!("{}{}", &plugin, "Exporter");
+        let loader = format_ident!("{}{}", &plugin, "Loader");
+        let saver = format_ident!("{}{}", &plugin, "Saver");
+
+        Self {
+            plugin,
+            exporter,
+            loader,
+            saver,
+        }
     }
 }
 

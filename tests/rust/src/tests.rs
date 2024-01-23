@@ -1,113 +1,62 @@
+use std::collections::HashMap;
+
 use gd_props::{traits::*, *};
-use godot::engine::IResource;
-use godot::prelude::{godot_api, Base, Gd, GodotClass, Resource};
+use godot::builtin::Array;
+use godot::prelude::{Gd, GodotClass};
 use serde::{Deserialize, Serialize};
 
 #[test]
 fn gd_can_serde() {
     #[derive(GodotClass, Serialize, Deserialize)]
     #[class(init, base=Resource)]
-    struct InnerResource {}
+    struct InnerResource;
 
-    #[godot_api]
-    impl InnerResource {}
-
-    #[derive(GodotClass, Serialize, Deserialize)]
-    #[class(base=Resource)]
-    struct OuterResource {
-        #[serde(with = "serde_gd::gd")]
-        inner: Gd<InnerResource>,
-    }
-
-    #[godot_api]
-    impl IResource for OuterResource {
-        fn init(_base: Base<Resource>) -> Self {
-            Self {
-                inner: Gd::<InnerResource>::default(),
-            }
-        }
-    }
-}
-
-#[test]
-fn gd_option_can_serde() {
     #[derive(GodotClass, Serialize, Deserialize)]
     #[class(base=Resource, init)]
-    struct InnerResource {}
-
-    #[godot_api]
-    impl InnerResource {}
-
-    #[derive(GodotClass, Serialize, Deserialize)]
-    #[class(init, base=Resource)]
     struct OuterResource {
+        #[serde(with = "serde_gd::gd")]
+        gd: Gd<InnerResource>,
         #[serde(with = "serde_gd::gd_option")]
-        #[export]
-        inner: Option<Gd<InnerResource>>,
+        gd_option: Option<Gd<InnerResource>>,
+        #[serde(with = "serde_gd::gd_array")]
+        gd_array: Array<Gd<InnerResource>>,
+        #[serde(with = "serde_gd::gd_hashmap")]
+        gd_hashmap: HashMap<i8, Gd<InnerResource>>,
+        #[serde(with = "serde_gd::ext")]
+        ext: Gd<InnerResource>,
+        #[serde(with = "serde_gd::ext_option")]
+        ext_option: Option<Gd<InnerResource>>,
+        #[serde(with = "serde_gd::ext_array")]
+        ext_array: Array<Gd<InnerResource>>,
+        #[serde(with = "serde_gd::ext_hashmap")]
+        ext_hashmap: HashMap<i8, Gd<InnerResource>>
     }
-
-    #[godot_api]
-    impl OuterResource {}
 }
 
 #[test]
-fn loader_can_be_implemented() {
+fn plugin_macro_can_be_implemented() {
     #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
-    struct TestStruct {}
-
-    #[godot_api]
-    impl TestStruct {}
+    struct TestStruct;
 
     #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
-    struct TestStruct2 {}
+    struct TestStruct2;
 
-    #[godot_api]
-    impl TestStruct2 {}
-
-    #[derive(GodotClass, GdPropLoader)]
-    #[class(init, tool, base=ResourceFormatLoader)]
+    #[gd_props_plugin]
     #[register(TestStruct)]
     #[register(TestStruct2)]
-    pub struct MyResourceLoader {}
+    pub struct MyPlugin;
 
-    assert_eq!(MyResourceLoader::SINGLETON_NAME, "MyResourceLoader");
-}
-
-#[test]
-fn saver_can_be_implemented() {
-    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
-    #[class(init, base=Resource)]
-    struct TestStruct {}
-
-    #[godot_api]
-    impl TestStruct {}
-
-    #[derive(GodotClass, Serialize, Deserialize, GdProp)]
-    #[class(init, base=Resource)]
-    struct TestStruct2 {}
-
-    #[godot_api]
-    impl TestStruct2 {}
-
-    #[derive(GodotClass, GdPropSaver)]
-    #[class(init, tool, base=ResourceFormatSaver)]
-    #[register(TestStruct)]
-    #[register(TestStruct2)]
-    pub struct MySaver {}
-
-    assert_eq!(MySaver::SINGLETON_NAME, "MySaver");
+    assert_eq!(MyPluginSaver::SINGLETON_NAME, "MyPluginSaver");
+    assert_eq!(MyPluginLoader::SINGLETON_NAME, "MyPluginLoader");
 }
 
 #[test]
 fn gdres_trait_can_be_implemented() {
     #[derive(GodotClass, Serialize, Deserialize, GdProp)]
     #[class(init, base=Resource)]
-    struct TestStruct {}
-
-    #[godot_api]
-    impl TestStruct {}
+    struct TestStruct;
 
     assert_eq!(TestStruct::HEAD_IDENT, "TestStruct");
 }

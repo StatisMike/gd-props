@@ -13,22 +13,28 @@
 //!
 //! - [GdProp] - used to implement [GdProp](crate::traits::GdProp) trait to the user-defined [Resource](godot::engine::Resource), making
 //! it saveable and loadable to/from `.gdron` and `.gdbin` files.
-//! - [GdPropLoader] and [GdPropSaver] - used to implement [GdPropLoader](crate::traits::GdPropLoader) and [GdPropSaver](crate::traits::GdPropSaver)
-//! traits to user-defined [ResourceFormatLoader](godot::engine::ResourceFormatLoader) and [ResourceFormatSaver](godot::engine::ResourceFormatSaver),
-//! which will be used by Godot to load and save [GdProp]-annotated resources.
+//! - [gd_props_plugin] - used to create all needed [GodotClass](godot::obj::GodotClass) structs to handle [GdProp]-annotated resources
+//! during saving/loading to and from custom formats and during project export.
 //!
 //! Additionally, [crate::serde_gd] module contains submodules to be used with `#[serde(with)]` attribute macro, making it possible
 //! to serialize sub-resources contained within [GdProp]-annotated resource.
 
+pub use gd_props_macros::gd_props_plugin;
 pub use gd_props_macros::GdProp;
-pub use gd_props_macros::GdPropLoader;
-pub use gd_props_macros::GdPropSaver;
 
 /// Module containing traits implemented by provided macros. There shouldn't be a necessity to implement them directly by the user.
 pub mod traits {
     pub use gd_props_defs::traits::GdProp;
+    pub use gd_props_defs::traits::GdPropExporter;
     pub use gd_props_defs::traits::GdPropLoader;
     pub use gd_props_defs::traits::GdPropSaver;
+    pub use gd_props_defs::traits::RefCountedSingleton;
+}
+
+/// Module containing types necessary for export plugin. Symbols not needed outside of internal usage.
+pub mod private {
+    pub use gd_props_defs::export_plugin::ExporterState;
+    pub use gd_props_defs::export_plugin::RemapData;
 }
 
 pub use gd_props_defs::errors;

@@ -1,0 +1,31 @@
+(gd_class:"WithBundledGd",uid:"uid://cpwwexxfr5fom")
+(
+    first: (
+        set: [
+            (
+                int: -125,
+                character: 'N',
+            ),
+        ],
+        vec: [
+            (
+                int: -173,
+                character: 'K',
+            ),
+        ],
+    ),
+    second: Some((
+        set: [
+            (
+                int: 2137,
+                character: 'A',
+            ),
+        ],
+        vec: [
+            (
+                int: -2137,
+                character: 'Z',
+            ),
+        ],
+    )),
+)
