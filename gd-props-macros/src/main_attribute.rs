@@ -29,24 +29,30 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #[derive(::godot::register::GodotClass)]
       #[class(base=EditorPlugin, init, editor_plugin, tool)]
       #marker struct #plugin {
+        exporter: ::godot::obj::Gd::<#exporter>,
         #[base]
         base: ::godot::obj::Base<::godot::engine::EditorPlugin>
       }
 
       #[::godot::register::godot_api]
       impl ::godot::engine::IEditorPlugin for #plugin {
+
         fn get_plugin_name(&self) -> ::godot::builtin::GString {
           ::godot::builtin::GString::from(stringify!(#plugin))
         }
 
         fn enter_tree(&mut self) {
+          let exporter = self.exporter.clone();
+
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
-          .add_export_plugin(::godot::obj::Gd::<#exporter>::default().upcast())
+          .add_export_plugin(exporter.upcast());
         }
 
         fn exit_tree(&mut self) {
+          let exporter = self.exporter.clone();
+
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
-          .remove_export_plugin(::godot::obj::Gd::<#exporter>::default().upcast())
+          .remove_export_plugin(exporter.upcast());
         }
       }
 
