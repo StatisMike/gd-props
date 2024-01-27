@@ -30,7 +30,6 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #[class(base=EditorPlugin, init, editor_plugin, tool)]
       #marker struct #plugin {
         exporter: ::godot::obj::Gd::<#exporter>,
-        #[base]
         base: ::godot::obj::Base<::godot::engine::EditorPlugin>
       }
 
@@ -60,7 +59,6 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #[class(base=EditorExportPlugin, init, tool)]
       #marker struct #exporter {
         state: ::gd_props::private::ExporterState,
-        #[base]
         base: ::godot::obj::Base< ::godot::engine::EditorExportPlugin>
       }
 
