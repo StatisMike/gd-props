@@ -20,7 +20,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build Documentation
-        run: cargo doc --no-deps
+        run: cargo doc -p gd-props --no-deps
         
       - name: Setup index
         run: cp ./doc_index.html ./target/doc/index.html
