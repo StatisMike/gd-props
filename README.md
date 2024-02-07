@@ -19,6 +19,18 @@ serialization and deserialization. Resources can be saved in two formats:
 - `.gdbin`: Based on the `MessagePack` format from the `rmp_serde` crate. Intended for faster serialization and deserialization 
 - times, especially in exported games.
 
+
+## Limitations
+If you include `gd-props` in your dependencies, you need use utilize [`godot`](https://github.com/godot-rust/gdext) crate with the feature
+`experimental-threads` enabled.
+
+This necessity arises from Godot's utilization of registered `ResourceFormatLoader`s methods during `InitLevel::Editor` on an additional 
+thread, which cannot be inhibited. The `godot` crate, by default, prohibits multi-threading (triggering a panic in debug builds), as it is 
+still not deemed safe by the maintainers.
+
+To monitor the current status of the `experimental-threads` feature requirement, you can follow this 
+[this issue](https://github.com/godot-rust/gdext/issues/597).
+
 ## Current Features
 
 The following features are currently available. More will be listed in the `In Development` section.

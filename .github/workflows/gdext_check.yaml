@@ -21,8 +21,8 @@ jobs:
         if: env.GDEXT_CHANGED == '0'
         run: |
           curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.everest-preview+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT }}" \
+            -H "Accept: application/vnd.github+json" \
             -H "Content-Type: application/json" \
             https://api.github.com/repos/StatisMike/gd-rehearse/actions/workflows/78299779/dispatches \
             --data '{"ref":"master"}'
