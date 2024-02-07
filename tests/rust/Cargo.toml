@@ -12,7 +12,7 @@ crate-type = ["cdylib"]
 [dependencies]
 gd-props = {path = "../../gd-props"}
 gd-rehearse = { git = "https://github.com/StatisMike/gd-rehearse", branch = "master" }
-godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
+godot = { git = "https://github.com/godot-rust/gdext", branch = "master", features = ["experimental-threads"] }
 serde = { version = "^1", features = ["derive"] }
 rand = "0.8.5"
 ron = "0.8.1"

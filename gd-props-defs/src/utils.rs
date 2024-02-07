@@ -7,15 +7,16 @@ use godot::{
 #[derive(GodotClass)]
 #[class(init, base=Object)]
 pub struct RefCountedSingletonWrapper {
-    obj: Gd<RefCounted>,
+    #[var]
+    inner: Gd<RefCounted>,
 }
 
 impl RefCountedSingletonWrapper {
-    pub fn new(obj: Gd<RefCounted>) -> Self {
-        Self { obj }
+    pub fn new(inner: Gd<RefCounted>) -> Self {
+        Self { inner }
     }
     pub fn clone_inner(&self) -> Gd<RefCounted> {
-        self.obj.clone()
+        self.inner.clone()
     }
 }
 
