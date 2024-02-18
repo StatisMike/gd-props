@@ -1,0 +1,35 @@
+name: "Custom badge"
+
+on:
+  workflow_run:
+    workflows: [gdext-check]
+    types:
+      - completed
+    branches:
+      - master
+
+jobs:
+
+  make_badge:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    env:
+      SHORT_SHA: "invalid"
+
+    steps:
+      - name: Get gdext latest commit
+        id: gdext_commit
+        shell: bash
+        run: |
+          sha=$(curl -s https://api.github.com/repos/godot-rust/gdext/commits/heads/master | jq -r ".sha")
+          echo "SHORT_SHA=${sha:0:10}" >> $GITHUB_ENV
+
+      - name: Last compatible gdext commit badge
+        uses: RubbaBoy/BYOB@v1.3.0
+        with:
+          name: gdext_latest_success
+          label: 'Latest compatible gdext'
+          status: ${{ env.SHORT_SHA }}
+          color: 148f07
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+    
