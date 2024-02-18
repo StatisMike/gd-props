@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 ron = "^0.8"
 serde = { version = "^1", features = ["derive"] }
-godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
+godot = { git = "https://github.com/StatisMike/gdext", branch = "hotfix/CI-errors-godot-build" }
 rmp-serde = "1.1.2"
 
 [dev-dependencies]
