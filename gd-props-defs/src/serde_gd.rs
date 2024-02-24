@@ -44,7 +44,7 @@ where
 /// #[godot_api]
 /// impl IResource for OuterResource {
 ///    fn init(_base: Base<Resource>) -> Self {
-///        Self { inner: Gd::<InnerResource>::new_default() }
+///        Self { inner: Gd::<InnerResource>::default() }
 ///    }
 /// }
 /// ```

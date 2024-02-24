@@ -29,7 +29,7 @@ fn gd_can_serde() {
         #[serde(with = "serde_gd::ext_array")]
         ext_array: Array<Gd<InnerResource>>,
         #[serde(with = "serde_gd::ext_hashmap")]
-        ext_hashmap: HashMap<i8, Gd<InnerResource>>
+        ext_hashmap: HashMap<i8, Gd<InnerResource>>,
     }
 }
 

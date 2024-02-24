@@ -50,17 +50,23 @@ jobs:
           echo "GODOT4_BIN=$(readlink -f ./godot_bin_cache/${{ env.GODOT_BINARY }})" >> $GITHUB_ENV
 
       - name: Build tests crate (debug)
-        shell: bash
-        run: | 
-          GODOT4_BIN=${{ env.GODOT4_BIN }}
-          cargo build -p tests
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: | 
+            GODOT4_BIN=${{ env.GODOT4_BIN }}
+            cargo build -p tests
 
       - name: Build tests crate (release)
         if: inputs.release == true
-        shell: bash
-        run: | 
-          GODOT4_BIN=${{ env.GODOT4_BIN }}
-          cargo build -p tests --release
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: | 
+            GODOT4_BIN=${{ env.GODOT4_BIN }}
+            cargo build -p tests --release
         
       - name: Run Godot integration tests (dev)
         if: inputs.release == false

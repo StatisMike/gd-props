@@ -9,18 +9,37 @@ on:
 
 jobs:
 
+  rust-test:
+    name: Cargo tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cargo test
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 3
+          command: cargo test
+
   debug-test:
+    name: Rust-Godot integration tests on debug build
+    needs: rust-test
     uses: ./.github/workflows/reusable_tests.yaml
     with:
       godot-version: 4.2
       release: false
 
   release-test:
+    name: Rust-Godot integration tests on release build
     needs: debug-test
     if: github.base_ref == 'master' || github.ref_name == 'master'
     uses: ./.github/workflows/reusable_tests.yaml
     with:
       godot-version: 4.2
       release: true
-
 
