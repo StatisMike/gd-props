@@ -17,7 +17,7 @@ jobs:
 
   release-test:
     needs: debug-test
-    if: github.head_ref == 'master'
+    if: github.base_ref == 'master' || github.ref_name == 'master'
     uses: ./.github/workflows/reusable_tests.yaml
     with:
       godot-version: 4.2
