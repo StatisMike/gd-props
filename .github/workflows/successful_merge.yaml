@@ -1,15 +1,22 @@
-name: Documentation generation
+name: Post-succesfull master merge actions
 
 on:
   push:
     branches:
-    - master
-  pull_request:
+      - master
 
 jobs:
+  gdext_sha: 
+    uses: ./.github/workflows/reusable_gdext_sha.yaml
+
+  gdext_badge:
+    uses: ./.github/workflows/reusable_gdext_badge.yaml
+    needs: gdext_sha
+    with: 
+      gdext_sha: ${{ needs.gdext_sha.outputs.sha }}
 
   doc:
-    name: Documentation on Github Pages
+    name: Deploy documentation on Github Pages
     runs-on: ubuntu-22.04
 
     steps:
@@ -26,7 +33,6 @@ jobs:
         run: cp ./doc_index.html ./target/doc/index.html
 
       - name: Deploy
-        if: ${{ github.event_name == 'push' }}
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

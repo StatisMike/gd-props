@@ -18,6 +18,10 @@ jobs:
           changed=$(echo $curled | jq -r "((now - (.commit.author.date | fromdateiso8601)) / (60*60*25) | trunc)")
           echo "changed=${changed}" >> "$GITHUB_OUTPUT"
 
+  gdext-sha:
+    needs: gdext-check
+    uses: ./.github/workflows/reusable_gdext_sha.yaml
+
   debug-test:
     needs: gdext-check
     if: needs.gdext-check.outputs.changed == '0'
@@ -34,3 +38,8 @@ jobs:
       godot-version: 4.2
       release: true
 
+  gdext-compat-badge:
+    needs: [gdext-sha, release-test]
+    uses: ./.github/workflows/reusable_gdext_badge.yaml
+    with:
+      gdext_sha: ${{ needs.gdext-sha.outputs.sha }}  

@@ -157,10 +157,10 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
         }
 
         fn load(
-          &self, 
-          path: ::godot::builtin::GString, 
-          _original_path: godot::builtin::GString, 
-          _use_sub_threads: bool, 
+          &self,
+          path: ::godot::builtin::GString,
+          _original_path: godot::builtin::GString,
+          _use_sub_threads: bool,
           _cache_mode: i32
         ) -> godot::builtin::Variant {
 
@@ -186,7 +186,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       }
 
       impl ::gd_props::traits::GdPropLoader for #loader {}
-      
+
       impl ::gd_props::traits::RefCountedSingleton for #loader {
         const SINGLETON_NAME: &'static str = stringify!(#loader);
       }
@@ -198,9 +198,9 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #[::godot::register::godot_api]
       impl ::godot::engine::IResourceFormatSaver for #saver {
         fn save(
-          &mut self, 
-          resource: godot::obj::Gd<godot::engine::Resource>, 
-          path: godot::builtin::GString, 
+          &mut self,
+          resource: godot::obj::Gd<godot::engine::Resource>,
+          path: godot::builtin::GString,
           _flags: u32
         ) -> godot::engine::global::Error {
 
@@ -224,7 +224,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
         }
 
         fn get_recognized_extensions(
-          &self, 
+          &self,
           _resource: ::godot::obj::Gd<godot::engine::Resource>
         ) -> godot::builtin::PackedStringArray {
           <Self as ::gd_props::traits::GdPropSaver>::_int_get_recognized_extensions(self)
@@ -236,7 +236,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       }
 
       impl ::gd_props::traits::GdPropSaver for #saver {}
-      
+
       impl ::gd_props::traits::RefCountedSingleton for #saver {
         const SINGLETON_NAME: &'static str = stringify!(#saver);
       }

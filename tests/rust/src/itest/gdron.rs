@@ -1,9 +1,7 @@
 use gd_rehearse::itest::gditest;
 use godot::builtin::GString;
 use godot::engine::global::Error;
-use godot::engine::{
-    load, save, try_load, DirAccess, ResourceLoader, ResourceSaver
-};
+use godot::engine::{load, save, try_load, DirAccess, ResourceLoader, ResourceSaver};
 use godot::obj::{Gd, NewGd};
 
 use crate::remove_file;
@@ -82,7 +80,6 @@ fn uid_is_stable() {
 
     remove_file(path, file);
 }
-
 
 #[gditest(scene_path = "res://dev_test.tscn")]
 fn can_save_bundled() {

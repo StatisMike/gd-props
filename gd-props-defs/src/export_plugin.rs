@@ -17,14 +17,14 @@ use crate::gdprop::GdProp;
 #[doc(hidden)]
 pub struct ExporterState {
     remaps: Vec<RemapData>,
-    debug: bool
+    debug: bool,
 }
 
 /// Trait containing most of the logic necessary for [EditorExportPlugin] to be able to handle
 /// `gd_props` custom resource formats upon `Godot` project export.
-/// 
+///
 /// Not necessary for users to implement this trait themselves. Use `#[gd_props_plugin]` macro
-/// for implementation of all necessary structs. 
+/// for implementation of all necessary structs.
 pub trait GdPropExporter
 where
     Self: GodotClass
@@ -37,7 +37,7 @@ where
 {
     #[doc(hidden)]
     fn _int_state_mut(&mut self) -> &mut ExporterState;
-    
+
     #[doc(hidden)]
     fn _int_remaps(&mut self) -> &mut Vec<RemapData> {
         &mut self._int_state_mut().remaps
