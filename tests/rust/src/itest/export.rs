@@ -1,4 +1,4 @@
-use gd_rehearse::{itest::gditest, CaseContext};
+use gd_rehearse::itest::*;
 use godot::{
     builtin::{GString, NodePath},
     engine::NodeExt,
@@ -7,7 +7,7 @@ use godot::{
 use crate::structs::node::ExportTestNode;
 
 #[gditest(scene_path = "res://export_test.tscn")]
-fn exported_can_retrieve_node(ctx: &CaseContext) {
+fn exported_can_retrieve_node(ctx: &TestContext) {
     let node = ctx
         .scene_tree()
         .try_get_node_as::<ExportTestNode>(NodePath::from("ExportTestNode"));
@@ -15,7 +15,7 @@ fn exported_can_retrieve_node(ctx: &CaseContext) {
 }
 
 #[gditest(scene_path = "res://export_test.tscn")]
-fn exported_bundled_works(ctx: &CaseContext) {
+fn exported_bundled_works(ctx: &TestContext) {
     let node = ctx
         .scene_tree()
         .try_get_node_as::<ExportTestNode>(NodePath::from("ExportTestNode"))
@@ -61,7 +61,7 @@ fn exported_bundled_works(ctx: &CaseContext) {
 }
 
 #[gditest(scene_path = "res://export_test.tscn")]
-fn exported_ext_works(ctx: &CaseContext) {
+fn exported_ext_works(ctx: &TestContext) {
     let node = ctx
         .scene_tree()
         .try_get_node_as::<ExportTestNode>(NodePath::from("ExportTestNode"))
