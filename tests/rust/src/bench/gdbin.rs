@@ -1,9 +1,10 @@
-use gd_rehearse::bench::gdbench;
+use gd_rehearse::bench::*;
 use godot::engine::{load, save};
 use godot::obj::Gd;
 use serde::{Deserialize, Serialize};
 
 use crate::remove_file;
+use crate::structs::node::{test_resource_setup, TestResourceNode};
 use crate::structs::resource::TestResource;
 
 #[gdbench(repeat = 10)]
@@ -30,13 +31,17 @@ fn deserialize() -> bool {
     true
 }
 
-#[gdbench(repeat = 5, scene_path = "res://dev_test.tscn")]
-fn gdbin_save() -> bool {
+#[gdbench(repeat = 10, setup = test_resource_setup, scene_path = "res://dev_test.tscn")]
+fn gdbin_save(ctx: &BenchContext) -> bool {
     let path = "res://";
     let file = "test.gdbin";
     let file_path = &format!("{}{}", path, file);
 
-    let resource = TestResource::new_random(50, 50);
+    let resource = ctx
+        .get_setup_node_as::<TestResourceNode>("TestResourceNode")
+        .bind()
+        .res
+        .clone();
 
     save(resource, file_path);
 

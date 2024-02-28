@@ -1,5 +1,5 @@
 # gd-props
-![tests workflow](https://github.com/StatisMike/gd-props/actions/workflows/tests.yaml/badge.svg)
+![Schedule tests](https://github.com/StatisMike/gd-props/actions/workflows/gdext_check.yaml/badge.svg)
 [![Latest compatible gdext](https://byob.yarr.is/StatisMike/gd-props/gdext_latest_success)](https://github.com/godot-rust/gdext)
 
 > Resources are akin to the versatile props that set the scene for an interactive masterpiece on the stage of game world. 

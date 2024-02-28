@@ -17,7 +17,7 @@ jobs:
 
   doc:
     name: Deploy documentation on Github Pages
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout sources
