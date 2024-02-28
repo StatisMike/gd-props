@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"attr":["gd_props_plugin"],"derive":["GdProp"],"mod":["errors","private","serde_gd","traits"]};
