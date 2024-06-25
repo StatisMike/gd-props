@@ -35,9 +35,12 @@ unsafe impl ExtensionLibrary for GodotIoTests {
 
     fn on_level_deinit(deinit: InitLevel) {
         if deinit == InitLevel::Scene {
+            godot::log::godot_print!("Level deinit");
             use gd_props::traits::GdPropLoader as _;
             use gd_props::traits::GdPropSaver as _;
+            godot::log::godot_print!("Unregistering saver");
             PropPluginSaver::unregister_saver();
+            godot::log::godot_print!("Unregistering loader");
             PropPluginLoader::unregister_loader();
         }
     }

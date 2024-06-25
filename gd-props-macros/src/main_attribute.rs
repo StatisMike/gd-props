@@ -29,7 +29,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #[derive(::godot::register::GodotClass)]
       #[class(base=EditorPlugin, init, editor_plugin, tool)]
       #marker struct #plugin {
-        exporter: ::godot::obj::Gd::<#exporter>,
+        exporter: Option<::godot::obj::Gd::<#exporter>>,
         base: ::godot::obj::Base<::godot::engine::EditorPlugin>
       }
 
@@ -41,17 +41,23 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
         }
 
         fn enter_tree(&mut self) {
-          let exporter = self.exporter.clone();
+          ::godot::log::godot_print!("Plugin entered tree!");
+          let exporter = ::godot::obj::Gd::<#exporter>::default();
 
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
-          .add_export_plugin(exporter.upcast());
+          .add_export_plugin(exporter.clone().upcast());
+
+          self.exporter = Some(exporter);
         }
 
         fn exit_tree(&mut self) {
-          let exporter = self.exporter.clone();
+          let exporter = self.exporter.clone().unwrap();
 
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
           .remove_export_plugin(exporter.upcast());
+          ::godot::log::godot_print!("Removed export plugin!");
+
+          self.exporter = None;
         }
       }
 

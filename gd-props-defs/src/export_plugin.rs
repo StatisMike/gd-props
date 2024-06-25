@@ -6,7 +6,7 @@ use godot::engine::{
     save, DirAccess, EditorExportPlugin, FileAccess, GFile, IEditorExportPlugin, Object,
     ResourceLoader, ResourceUid,
 };
-use godot::log::godot_error;
+use godot::log::{godot_error, godot_print};
 use godot::obj::bounds::MemRefCounted;
 use godot::obj::cap::GodotDefault;
 use godot::obj::{Bounds, GodotClass, Inherits, UserClass};
@@ -128,6 +128,7 @@ where
 
     #[doc(hidden)]
     fn _int_export_end(&mut self) {
+        godot_print!("Ending export!");
         while let Some(remap) = self._int_remaps().pop() {
             remap.undo_uid();
             DirAccess::remove_absolute(remap.bin_path.clone());
@@ -159,7 +160,8 @@ impl RemapData {
     }
 
     pub(crate) fn undo_uid(&self) {
-        self.change_uid(self.ron_path.clone())
+        godot_print!("Chaning uid from path: {} back to path: {}", self.bin_path, self.ron_path);
+        self.change_uid(self.ron_path.clone());
     }
 
     fn change_uid(&self, path: GString) {
