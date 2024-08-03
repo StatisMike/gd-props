@@ -5,9 +5,7 @@ use crate::structs::node::ExportTestNode;
 
 #[gditest(scene_path = "res://export_test.tscn")]
 fn exported_can_retrieve_node(ctx: &TestContext) {
-    let node = ctx
-        .scene_tree()
-        .get_node_or_null("ExportTestNode".into());
+    let node = ctx.scene_tree().get_node_or_null("ExportTestNode".into());
     assert!(node.is_some());
 }
 

@@ -1,6 +1,7 @@
 use gd_rehearse::itest::gditest;
 use godot::builtin::GString;
-use godot::engine::{load, save, DirAccess, ResourceLoader};
+use godot::classes::{DirAccess, ResourceLoader};
+use godot::tools::{load, save};
 
 use crate::remove_file;
 use crate::structs::resource::TestResource;

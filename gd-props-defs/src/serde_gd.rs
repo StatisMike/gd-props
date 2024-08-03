@@ -24,7 +24,7 @@ where
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(GodotClass, Serialize, Deserialize)]
@@ -80,7 +80,7 @@ pub mod gd {
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(GodotClass, Serialize, Deserialize)]
@@ -147,7 +147,7 @@ pub mod gd_option {
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use godot::builtin::Array;
 /// use serde::{Serialize, Deserialize};
 /// use std::collections::HashMap;
@@ -209,7 +209,7 @@ pub mod gd_hashmap {
     }
 }
 
-/// Module that can be used to serialize and deserialize objects castable to [`Resource`](godot::engine::Resource) on basis
+/// Module that can be used to serialize and deserialize objects castable to [`Resource`](godot::classes::Resource) on basis
 /// of their pointers contained within [`Array`](godot::builtin::Array) collection.
 ///
 /// Its main use is to derive [serde::Serialize] and [serde::Deserialize] on resources containing pointers to other
@@ -219,7 +219,7 @@ pub mod gd_hashmap {
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use godot::builtin::Array;
 /// use serde::{Serialize, Deserialize};
 ///
@@ -243,7 +243,7 @@ pub mod gd_hashmap {
 /// ```
 pub mod gd_array {
     use godot::builtin::Array;
-    use godot::engine::Resource;
+    use godot::classes::Resource;
     use godot::obj::UserClass;
     use godot::obj::{Gd, GodotClass, Inherits};
 
@@ -284,16 +284,16 @@ pub mod gd_array {
 /// External Resource which [`Gd`] is contained within the annotated field don't need to implement [`serde::Serialize`] and
 /// [`serde::Deserialize`] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
 /// is saved upon serialization as and upon deserialization, the resource is loaded using
-/// [`ResourceLoader`](godot::engine::ResourceLoader) singleton on its basis.
+/// [`ResourceLoader`](godot::classes::ResourceLoader) singleton on its basis.
 ///
 /// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime
-/// requirement is that the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global `ResourceLoader`.
+/// requirement is that the [`ResourceFormatLoader`](godot::classes::ResourceFormatLoader) is registered in global `ResourceLoader`.
 ///
 /// ## Example
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(GodotClass, Serialize, Deserialize)]
@@ -315,7 +315,7 @@ pub mod gd_array {
 /// ```
 pub mod ext {
     use crate::gd_meta::{GdExtResource, GdMetaExt};
-    use godot::engine::Resource;
+    use godot::classes::Resource;
     use godot::obj::{Gd, GodotClass, Inherits};
 
     use serde::{de, ser, Deserialize, Serialize};
@@ -342,8 +342,8 @@ pub mod ext {
         S: ser::Serializer,
         T: GodotClass + Inherits<Resource>,
     {
-        let mut loader = godot::engine::ResourceLoader::singleton();
-        let res_uid = godot::engine::ResourceUid::singleton();
+        let mut loader = godot::classes::ResourceLoader::singleton();
+        let res_uid = godot::classes::ResourceUid::singleton();
         let upcasted = pointer.clone().upcast::<Resource>();
         let path = upcasted.get_path();
         let gd_class = upcasted.get_class().to_string();
@@ -361,18 +361,18 @@ pub mod ext {
 ///
 /// External Resource which optional godot pointer is contained within the annotated field don't need to implement [`serde::Serialize`]
 /// and [`serde::Deserialize`] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
-/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader) singleton
+/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::classes::ResourceLoader) singleton
 /// on basis of this data.
 ///
 /// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime
-/// requirement is that the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global
-/// [`ResourceLoader`](godot::engine::ResourceLoader).
+/// requirement is that the [`ResourceFormatLoader`](godot::classes::ResourceFormatLoader) is registered in global
+/// [`ResourceLoader`](godot::classes::ResourceLoader).
 ///
 /// ## Example
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use serde::{Serialize, Deserialize};
 ///
 /// #[derive(GodotClass, Serialize, Deserialize)]
@@ -395,7 +395,7 @@ pub mod ext {
 /// ```
 pub mod ext_option {
 
-    use godot::engine::Resource;
+    use godot::classes::Resource;
     use godot::obj::{Gd, GodotClass, Inherits};
     use serde::{de, ser, Deserialize, Serialize};
 
@@ -435,17 +435,17 @@ pub mod ext_option {
 ///
 /// External Resource which pointers are contained within the annotated `HashMap` field don't need to implement [serde::Serialize]
 /// and [serde::Deserialize] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
-/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader) singleton
+/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::classes::ResourceLoader) singleton
 /// on basis of this data.
 ///
 /// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime requirement is that
-/// the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global [`ResourceLoader`](godot::engine::ResourceLoader).
+/// the [`ResourceFormatLoader`](godot::classes::ResourceFormatLoader) is registered in global [`ResourceLoader`](godot::classes::ResourceLoader).
 ///
 /// ## Example
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use godot::builtin::Array;
 /// use serde::{Serialize, Deserialize};
 /// use std::collections::HashMap;
@@ -473,7 +473,7 @@ pub mod ext_hashmap {
     use std::hash::Hash;
 
     use crate::gd_meta::{GdExtResource, GdMetaExt};
-    use godot::engine::Resource;
+    use godot::classes::Resource;
     use godot::obj::{Gd, GodotClass, Inherits};
     use serde::{de, ser, Deserialize, Serialize};
 
@@ -507,8 +507,8 @@ pub mod ext_hashmap {
         T: GodotClass + Inherits<Resource>,
         K: Hash + Eq + PartialEq + Serialize + Clone,
     {
-        let mut loader = godot::engine::ResourceLoader::singleton();
-        let res_uid = godot::engine::ResourceUid::singleton();
+        let mut loader = godot::classes::ResourceLoader::singleton();
+        let res_uid = godot::classes::ResourceUid::singleton();
 
         let external: HashMap<K, GdExtResource> =
             HashMap::from_iter(map.iter().map(|(k, element)| {
@@ -536,17 +536,17 @@ pub mod ext_hashmap {
 ///
 /// External Resource which pointers are contained within the annotated `GdResVec` field don't need to implement [serde::Serialize]
 /// and [serde::Deserialize] - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
-/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::engine::ResourceLoader)
+/// is saved upon serialization and upon deserialization, the resource is loaded using [`ResourceLoader`](godot::classes::ResourceLoader)
 /// singleton on basis of this data.
 ///
 /// The External Resource can be both godot built-in resource and other rust-defined custom [`Resource`]. Only runtime requirement is that
-/// the [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) is registered in global [`ResourceLoader`](godot::engine::ResourceLoader).
+/// the [`ResourceFormatLoader`](godot::classes::ResourceFormatLoader) is registered in global [`ResourceLoader`](godot::classes::ResourceLoader).
 ///
 /// ## Example
 ///
 /// ```no_run
 /// use godot::prelude::*;
-/// use godot::engine::{Resource, IResource};
+/// use godot::classes::{Resource, IResource};
 /// use godot::builtin::Array;
 /// use serde::{Serialize, Deserialize};
 ///
@@ -571,7 +571,7 @@ pub mod ext_array {
 
     use crate::gd_meta::{GdExtResource, GdMetaExt};
     use godot::builtin::Array;
-    use godot::engine::Resource;
+    use godot::classes::Resource;
     use godot::obj::{Gd, GodotClass, Inherits};
     use serde::{de, ser, Deserialize, Serialize};
 
@@ -603,8 +603,8 @@ pub mod ext_array {
         S: ser::Serializer,
         T: GodotClass + Inherits<Resource>,
     {
-        let mut loader = godot::engine::ResourceLoader::singleton();
-        let res_uid = godot::engine::ResourceUid::singleton();
+        let mut loader = godot::classes::ResourceLoader::singleton();
+        let res_uid = godot::classes::ResourceUid::singleton();
 
         let serialized: Vec<GdExtResource> = vec
             .iter_shared()

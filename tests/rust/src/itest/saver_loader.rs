@@ -1,8 +1,9 @@
 use gd_props::traits::RefCountedSingleton;
 use gd_rehearse::itest::gditest;
 use godot::builtin::GString;
-use godot::engine::{load, save, try_load, DirAccess, ResourceLoader, ResourceSaver};
+use godot::classes::{DirAccess, ResourceLoader, ResourceSaver};
 use godot::obj::NewGd;
+use godot::tools::{load, save, try_load};
 
 use crate::structs::prop_handlers::{PropPluginLoader, PropPluginSaver};
 use crate::structs::resource::TestResource;

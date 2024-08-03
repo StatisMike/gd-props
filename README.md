@@ -21,6 +21,9 @@ serialization and deserialization. Resources can be saved in two formats:
 
 
 ## Limitations
+
+> Currently `gd-props` supports only `Resource`s without the `Base<Resource>` field.
+
 If you include `gd-props` in your dependencies, you need use utilize [`godot`](https://github.com/godot-rust/gdext) crate with the feature
 `experimental-threads` enabled.
 

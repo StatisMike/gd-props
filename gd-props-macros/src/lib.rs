@@ -6,7 +6,7 @@ pub(crate) mod main_attribute;
 pub(crate) mod translate;
 pub(crate) mod utils;
 
-/// Macro used to implement [GdProp](gd_props_defs::traits::GdProp) trait, which makes a rust-defined Godot [Resource](godot::engine::Resource)
+/// Macro used to implement [GdProp](gd_props_defs::traits::GdProp) trait, which makes a rust-defined Godot [Resource](godot::classes::Resource)
 /// saveable and loadable to and from `.gdron` and `.gdbin` formats.
 ///
 /// Provides compatibility with [GdPropSaver] and [GdPropLoader] deriving structs.
@@ -31,9 +31,9 @@ pub fn derive_gd_resource(input: TokenStream) -> TokenStream {
 /// This single macro is used to implement four different, intertwined [`GodotClass`](godot::obj::GodotClass)
 /// structs with all necessary implementations:
 ///
-/// - [`ResourceFormatLoader`](godot::engine::ResourceFormatLoader) and [`ResourceFormatSaver`](godot::engine::ResourceFormatSaver): used to
+/// - [`ResourceFormatLoader`](godot::classes::ResourceFormatLoader) and [`ResourceFormatSaver`](godot::classes::ResourceFormatSaver): used to
 /// load and save [`GdProp`]-deriving resources to `.gdbin` and `.gdron` formats,
-/// - [`EditorPlugin`](godot::engine::EditorPlugin) and [`EditorExportPlugin`](godot::engine::EditorExportPlugin) which handle
+/// - [`EditorPlugin`](godot::classes::EditorPlugin) and [`EditorExportPlugin`](godot::classes::EditorExportPlugin) which handle
 /// exporting `.gdbin` and `.gdron` format files. `.gdron` files are transformed into more compact and faster `.gdbin` format
 /// during export.
 ///

@@ -1,5 +1,5 @@
 use gd_rehearse::bench::*;
-use godot::engine::{load, save};
+use godot::tools::{load, save};
 use godot::obj::Gd;
 use serde::{Deserialize, Serialize};
 

@@ -7,13 +7,12 @@ publish = false
 [lib]
 crate-type = ["cdylib"]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 gd-props = {path = "../../gd-props"}
 gd-rehearse = { git = "https://github.com/StatisMike/gd-rehearse", branch = "master" }
-godot = { git = "https://github.com/godot-rust/gdext", branch = "master", features = ["experimental-threads"] }
+## feature currently needed for `gd-props` to work: https://github.com/godot-rust/gdext/issues/597
+godot = { version = "0.1.*", features = ["experimental-threads"] }
 serde = { version = "^1", features = ["derive"] }
-rand = "0.8.5"
-ron = "0.8.1"
-rmp-serde = "1.1.2"
+rand = "^0.8.5"
+ron = "^0.8.1"
+rmp-serde = "^1.1.2"

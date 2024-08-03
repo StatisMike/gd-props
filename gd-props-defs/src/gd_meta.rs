@@ -1,10 +1,11 @@
 use std::io::BufRead;
 
 use godot::builtin::GString;
-use godot::engine::file_access::ModeFlags;
-use godot::engine::{FileAccess, GFile, Resource, ResourceLoader, ResourceUid};
+use godot::classes::file_access::ModeFlags;
+use godot::classes::{FileAccess, Resource, ResourceLoader, ResourceUid};
 use godot::obj::Gd;
 
+use godot::tools::GFile;
 use serde::{Deserialize, Serialize};
 
 use crate::errors::GdPropError;

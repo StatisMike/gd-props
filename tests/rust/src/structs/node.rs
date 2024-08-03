@@ -1,5 +1,5 @@
 use gd_rehearse::bench::BenchContext;
-use godot::engine::{INode, Node};
+use godot::classes::{INode, Node};
 use godot::obj::{Base, Gd, NewAlloc};
 use godot::register::{godot_api, GodotClass};
 

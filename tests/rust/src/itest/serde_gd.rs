@@ -3,7 +3,7 @@ use std::io::BufWriter;
 
 use gd_rehearse::itest::gditest;
 use godot::builtin::{Array, GString};
-use godot::engine::ResourceLoader;
+use godot::classes::ResourceLoader;
 use godot::obj::Gd;
 
 use ron::Serializer;
