@@ -1,7 +1,7 @@
 use gd_rehearse::itest::gditest;
 use godot::builtin::GString;
-use godot::global::Error;
 use godot::classes::{DirAccess, ResourceLoader, ResourceSaver};
+use godot::global::Error;
 use godot::obj::{Gd, NewGd};
 use godot::tools::{load, save, try_load};
 

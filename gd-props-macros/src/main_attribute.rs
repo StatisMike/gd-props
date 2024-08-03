@@ -41,7 +41,6 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
         }
 
         fn enter_tree(&mut self) {
-          ::godot::log::godot_print!("Plugin entered tree!");
           let exporter = ::godot::obj::Gd::<#exporter>::default();
 
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
@@ -55,7 +54,6 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
 
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
           .remove_export_plugin(exporter.upcast());
-          ::godot::log::godot_print!("Removed export plugin!");
 
           self.exporter = None;
         }
@@ -113,7 +111,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
             )*
 
             if let Some(bytes) = bytes {
-              ::godot::log::godot_print!("Adding resource of {} type, from: {}; Remapped to: {}", &type_, &path, &changed_path);
+              ::godot::log::godot_print!("[{}]: .gdron -> .gdbin remap: {} type, from: {}; Remapped to: {}", stringify!(#exporter), &type_, &path, &changed_path);
               <Self as ::godot::obj::WithBaseField>::base_mut(self).add_file(changed_path, bytes, true);
             }
           }
