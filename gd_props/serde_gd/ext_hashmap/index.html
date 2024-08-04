@@ -1,0 +1,32 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Module that can be used to serialize and deserialize optional External Resources kept within your custom [`Resource`] in a `HashMap`."><title>gd_props::serde_gd::ext_hashmap - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../" data-static-root-path="../../../static.files/" data-current-crate="gd_props" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="../sidebar-items.js"></script><script defer src="../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc mod"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../gd_props/index.html">gd_props</a><span class="version">0.1.0</span></h2></div><h2 class="location"><a href="#">Module ext_hashmap</a></h2><div class="sidebar-elems"><section><ul class="block"><li><a href="#functions">Functions</a></li></ul></section><h2><a href="../index.html">In gd_props::serde_gd</a></h2></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Module <a href="../../index.html">gd_props</a>::<wbr><a href="../index.html">serde_gd</a>::<wbr><a class="mod" href="#">ext_hashmap</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Module that can be used to serialize and deserialize optional External Resources kept within your custom [<code>Resource</code>]
+in a <a href="https://doc.rust-lang.org/1.80.0/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap"><code>HashMap</code></a>.</p>
+<p>External Resource which pointers are contained within the annotated <code>HashMap</code> field don’t need to implement <a href="https://docs.rs/serde/1.0.204/serde/ser/trait.Serialize.html" title="trait serde::ser::Serialize">serde::Serialize</a>
+and <a href="https://docs.rs/serde/1.0.204/serde/de/trait.Deserialize.html" title="trait serde::de::Deserialize">serde::Deserialize</a> - no regular serialization/deserialization is made there. Instead, the resource class, UID and path
+is saved upon serialization and upon deserialization, the resource is loaded using <a href="godot::classes::ResourceLoader"><code>ResourceLoader</code></a> singleton
+on basis of this data.</p>
+<p>The External Resource can be both godot built-in resource and other rust-defined custom [<code>Resource</code>]. Only runtime requirement is that
+the <a href="godot::classes::ResourceFormatLoader"><code>ResourceFormatLoader</code></a> is registered in global <a href="godot::classes::ResourceLoader"><code>ResourceLoader</code></a>.</p>
+<h3 id="example"><a class="doc-anchor" href="#example">§</a>Example</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>godot::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>godot::classes::{Resource, IResource};
+<span class="kw">use </span>godot::builtin::Array;
+<span class="kw">use </span>serde::{Serialize, Deserialize};
+<span class="kw">use </span>std::collections::HashMap;
+
+<span class="attr">#[derive(GodotClass, Serialize, Deserialize)]
+#[class(base=Resource, init)]
+</span><span class="kw">struct </span>InnerResource {}
+
+<span class="attr">#[godot_api]
+</span><span class="kw">impl </span>InnerResource {}
+
+<span class="attr">#[derive(GodotClass, Serialize, Deserialize)]
+#[class(init, base=Resource)]
+</span><span class="kw">struct </span>OuterResource {
+    <span class="attr">#[serde(with=<span class="string">"gd_props::serde_gd::ext_hashmap"</span>)]
+    </span>inner: HashMap&lt;String, Gd&lt;InnerResource&gt;&gt;
+}
+
+<span class="attr">#[godot_api]
+</span><span class="kw">impl </span>OuterResource {}</code></pre></div>
+</div></details><h2 id="functions" class="section-header">Functions<a href="#functions" class="anchor">§</a></h2><ul class="item-table"><li><div class="item-name"><a class="fn" href="fn.deserialize.html" title="fn gd_props::serde_gd::ext_hashmap::deserialize">deserialize</a></div></li><li><div class="item-name"><a class="fn" href="fn.serialize.html" title="fn gd_props::serde_gd::ext_hashmap::serialize">serialize</a></div></li></ul></section></div></main></body></html>

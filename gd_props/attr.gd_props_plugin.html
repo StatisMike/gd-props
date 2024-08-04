@@ -1,0 +1,44 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Implement GodotClasses necessary for `.gdbin` and `.gdron` files handling within Godot"><title>gd_props_plugin in gd_props - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../" data-static-root-path="../static.files/" data-current-crate="gd_props" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0 (051478957 2024-07-21)" data-channel="1.80.0" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../static.files/storage-118b08c4c78b968e.js"></script><script defer src="sidebar-items.js"></script><script defer src="../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc attr"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../gd_props/index.html">gd_props</a><span class="version">0.1.0</span></h2></div><div class="sidebar-elems"></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Attribute Macro <a href="index.html">gd_props</a>::<wbr><a class="attr" href="#">gd_props_plugin</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>#[gd_props_plugin]</code></pre><details class="toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>Implement GodotClasses necessary for <code>.gdbin</code> and <code>.gdron</code> files handling within Godot</p>
+<p>This single macro is used to implement four different, intertwined <a href="godot::obj::GodotClass"><code>GodotClass</code></a>
+structs with all necessary implementations:</p>
+<ul>
+<li><a href="godot::classes::ResourceFormatLoader"><code>ResourceFormatLoader</code></a> and <a href="godot::classes::ResourceFormatSaver"><code>ResourceFormatSaver</code></a>: used to
+load and save <a href="derive.GdProp.html" title="derive gd_props::GdProp"><code>GdProp</code></a>-deriving resources to <code>.gdbin</code> and <code>.gdron</code> formats,</li>
+<li><a href="godot::classes::EditorPlugin"><code>EditorPlugin</code></a> and <a href="godot::classes::EditorExportPlugin"><code>EditorExportPlugin</code></a> which handle
+exporting <code>.gdbin</code> and <code>.gdron</code> format files. <code>.gdron</code> files are transformed into more compact and faster <code>.gdbin</code> format
+during export.</li>
+</ul>
+<p>Identifiers will be generated based on provided struct <code>Identifier</code>, with the visibility marker provided, either <code>pub</code> or <code>pub(crate)</code>:</p>
+<ul>
+<li><code>EditorPlugin</code>: <code>Identifier</code>,</li>
+<li><code>EditorExportPlugin</code>: <code>IdentifierExporter</code>,</li>
+<li><code>ResourceFormatSaver</code>: <code>IdentifierSaver</code>,</li>
+<li><code>ResourceFormatLoader</code>: <code>IdentifierLoader</code>.</li>
+</ul>
+<h3 id="register-gdprop-resources"><a class="doc-anchor" href="#register-gdprop-resources">§</a>Register <a href="derive.GdProp.html" title="derive gd_props::GdProp"><code>GdProp</code></a> resources</h3>
+<p>Every resource that should be saveable/loadable/exportable as <code>.gdbin</code>/<code>.gdron</code> file needs to be provided in helper
+<code>#[register]</code> macro attribute, as seen in example below. Multiple <code>#[register]</code> helper macros with different identifiers can be provided
+for code readability.</p>
+<h3 id="setup"><a class="doc-anchor" href="#setup">§</a>Setup</h3>
+<p>Created plugins don’t need further setup: as they are created, they will be registered and used by <code>Godot</code> automatically
+during export.</p>
+<p>Loader and Saver need registering in your <a href="godot::init::gdextension"><code>#[gdextension]</code></a> implementation. It is recommended to
+use provided associated functions: <a href="gd_props_defs::traits::GdPropSaver::register_saver"><code>register_saver</code></a> and
+<a href="gd_props_defs::traits::GdPropLoader::register_loader"><code>register_loader</code></a> - for implementation details see their documentation.</p>
+<h3 id="example"><a class="doc-anchor" href="#example">§</a>Example</h3>
+<div class="example-wrap"><pre class="rust rust-example-rendered"><code><span class="kw">use </span>godot::prelude::<span class="kw-2">*</span>;
+<span class="kw">use </span>gd_props::gd_props_plugin;
+
+<span class="comment">// Macro creates four different GodotClasses and registers two resources implementing `GdProp`
+</span><span class="attr">#[gd_props_plugin]
+#[register(MyResource, MyOtherResource)]
+</span><span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">struct </span>MyPropPlugin;
+
+<span class="comment">// Plugin and Exporter are only available in-editor for exporting resources.
+</span><span class="macro">assert_eq!</span>(MyPropPlugin::INIT_LEVEL, InitLevel::Editor);
+<span class="macro">assert_eq!</span>(MyPropPluginExporter::INIT_LEVEL, InitLevel::Editor);
+
+<span class="comment">// Loader and Saver are available in scenes for loading/saving registered resources.
+</span><span class="macro">assert_eq!</span>(MyPropPluginSaver::INIT_LEVEL, InitLevel::Scene);
+<span class="macro">assert_eq!</span>(MyPropPluginLoader::INIT_LEVEL, InitLevel::Scene);</code></pre></div>
+</div></details></section></div></main></body></html>
