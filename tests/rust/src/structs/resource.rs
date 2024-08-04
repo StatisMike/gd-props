@@ -3,7 +3,7 @@ use std::collections::{HashMap, HashSet};
 use gd_props::GdProp;
 
 use godot::builtin::{Array, GString};
-use godot::engine::{IResource, ResourceSaver};
+use godot::classes::{IResource, ResourceSaver};
 use godot::obj::Gd;
 use godot::prelude::{godot_api, GodotClass};
 

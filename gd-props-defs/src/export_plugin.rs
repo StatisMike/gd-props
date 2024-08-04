@@ -1,15 +1,16 @@
 use std::io::Read;
 
 use godot::builtin::{GString, PackedByteArray};
-use godot::engine::file_access::ModeFlags;
-use godot::engine::{
-    save, DirAccess, EditorExportPlugin, FileAccess, GFile, IEditorExportPlugin, Object,
-    ResourceLoader, ResourceUid,
+use godot::classes::file_access::ModeFlags;
+use godot::classes::{
+    DirAccess, EditorExportPlugin, FileAccess, IEditorExportPlugin, Object, ResourceLoader,
+    ResourceUid,
 };
 use godot::log::godot_error;
 use godot::obj::bounds::MemRefCounted;
 use godot::obj::cap::GodotDefault;
 use godot::obj::{Bounds, GodotClass, Inherits, UserClass};
+use godot::tools::{save, GFile};
 
 use crate::gdprop::GdProp;
 
@@ -159,7 +160,7 @@ impl RemapData {
     }
 
     pub(crate) fn undo_uid(&self) {
-        self.change_uid(self.ron_path.clone())
+        self.change_uid(self.ron_path.clone());
     }
 
     fn change_uid(&self, path: GString) {

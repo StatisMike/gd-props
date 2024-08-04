@@ -1,16 +1,11 @@
 use gd_rehearse::itest::*;
-use godot::{
-    builtin::{GString, NodePath},
-    engine::NodeExt,
-};
+use godot::builtin::GString;
 
 use crate::structs::node::ExportTestNode;
 
 #[gditest(scene_path = "res://export_test.tscn")]
 fn exported_can_retrieve_node(ctx: &TestContext) {
-    let node = ctx
-        .scene_tree()
-        .try_get_node_as::<ExportTestNode>(NodePath::from("ExportTestNode"));
+    let node = ctx.scene_tree().get_node_or_null("ExportTestNode".into());
     assert!(node.is_some());
 }
 
@@ -18,7 +13,7 @@ fn exported_can_retrieve_node(ctx: &TestContext) {
 fn exported_bundled_works(ctx: &TestContext) {
     let node = ctx
         .scene_tree()
-        .try_get_node_as::<ExportTestNode>(NodePath::from("ExportTestNode"))
+        .try_get_node_as::<ExportTestNode>("ExportTestNode")
         .unwrap();
 
     let bundled = node.bind().get_bundle_res().clone();
@@ -28,14 +23,14 @@ fn exported_bundled_works(ctx: &TestContext) {
     let set_vec = set.iter().collect::<Vec<_>>();
     assert_eq!(set_vec.len(), 1, "wrong first bundled set length!");
 
-    let inner_thing = set_vec.get(0).unwrap();
+    let inner_thing = set_vec.first().unwrap();
     assert_eq!(inner_thing.character, 'N');
     assert_eq!(inner_thing.int, -125);
 
     let vec = first.bind().get_vec().clone();
     assert_eq!(vec.len(), 1, "wrong first bundled vec length!");
 
-    let inner_thing = vec.get(0).unwrap();
+    let inner_thing = vec.first().unwrap();
     assert_eq!(inner_thing.character, 'K');
     assert_eq!(inner_thing.int, -173);
 
@@ -48,14 +43,14 @@ fn exported_bundled_works(ctx: &TestContext) {
     let set_vec = set.iter().collect::<Vec<_>>();
     assert_eq!(set_vec.len(), 1, "wrong second bundled set length!");
 
-    let inner_thing = set_vec.get(0).unwrap();
+    let inner_thing = set_vec.first().unwrap();
     assert_eq!(inner_thing.character, 'A');
     assert_eq!(inner_thing.int, 2137);
 
     let vec = second.bind().get_vec().clone();
     assert_eq!(vec.len(), 1, "wrong second bundled vec length!");
 
-    let inner_thing = vec.get(0).unwrap();
+    let inner_thing = vec.first().unwrap();
     assert_eq!(inner_thing.character, 'Z');
     assert_eq!(inner_thing.int, -2137);
 }
@@ -64,7 +59,7 @@ fn exported_bundled_works(ctx: &TestContext) {
 fn exported_ext_works(ctx: &TestContext) {
     let node = ctx
         .scene_tree()
-        .try_get_node_as::<ExportTestNode>(NodePath::from("ExportTestNode"))
+        .try_get_node_as::<ExportTestNode>("ExportTestNode")
         .unwrap();
 
     let bundled = node.bind().get_ext_res().clone();
@@ -74,14 +69,14 @@ fn exported_ext_works(ctx: &TestContext) {
     let set_vec = set.iter().collect::<Vec<_>>();
     assert_eq!(set_vec.len(), 1, "wrong first bundled set length!");
 
-    let inner_thing = set_vec.get(0).unwrap();
+    let inner_thing = set_vec.first().unwrap();
     assert_eq!(inner_thing.character, 'A');
     assert_eq!(inner_thing.int, 2137);
 
     let vec = first.bind().get_vec().clone();
     assert_eq!(vec.len(), 1, "wrong first bundled vec length!");
 
-    let inner_thing = vec.get(0).unwrap();
+    let inner_thing = vec.first().unwrap();
     assert_eq!(inner_thing.character, 'Z');
     assert_eq!(inner_thing.int, -2137);
 

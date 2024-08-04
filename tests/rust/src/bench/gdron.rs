@@ -1,6 +1,6 @@
 use gd_rehearse::bench::{gdbench, BenchContext};
-use godot::engine::{load, save};
 use godot::obj::Gd;
+use godot::tools::{load, save};
 use serde::{Deserialize, Serialize};
 
 use crate::remove_file;

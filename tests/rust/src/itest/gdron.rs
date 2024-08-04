@@ -1,8 +1,9 @@
 use gd_rehearse::itest::gditest;
 use godot::builtin::GString;
-use godot::engine::global::Error;
-use godot::engine::{load, save, try_load, DirAccess, ResourceLoader, ResourceSaver};
+use godot::classes::{DirAccess, ResourceLoader, ResourceSaver};
+use godot::global::Error;
 use godot::obj::{Gd, NewGd};
+use godot::tools::{load, save, try_load};
 
 use crate::remove_file;
 use crate::structs::resource::{TestGodotResource, TestResource, WithBundledGd, WithExtGd};

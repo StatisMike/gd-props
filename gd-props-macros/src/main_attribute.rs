@@ -21,37 +21,41 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
     let VisMarkerHandler { marker } = VisMarkerHandler::from_item(item)?;
 
     Ok(quote! {
-      use ::godot::engine::IEditorPlugin as _;
-      use ::godot::engine::IEditorExportPlugin as _;
-      use ::godot::engine::IResourceFormatSaver as _;
-      use ::godot::engine::IResourceFormatLoader as _;
+      use ::godot::classes::IEditorPlugin as _;
+      use ::godot::classes::IEditorExportPlugin as _;
+      use ::godot::classes::IResourceFormatSaver as _;
+      use ::godot::classes::IResourceFormatLoader as _;
 
       #[derive(::godot::register::GodotClass)]
       #[class(base=EditorPlugin, init, editor_plugin, tool)]
       #marker struct #plugin {
-        exporter: ::godot::obj::Gd::<#exporter>,
-        base: ::godot::obj::Base<::godot::engine::EditorPlugin>
+        exporter: Option<::godot::obj::Gd::<#exporter>>,
+        base: ::godot::obj::Base<::godot::classes::EditorPlugin>
       }
 
       #[::godot::register::godot_api]
-      impl ::godot::engine::IEditorPlugin for #plugin {
+      impl ::godot::classes::IEditorPlugin for #plugin {
 
         fn get_plugin_name(&self) -> ::godot::builtin::GString {
           ::godot::builtin::GString::from(stringify!(#plugin))
         }
 
         fn enter_tree(&mut self) {
-          let exporter = self.exporter.clone();
+          let exporter = ::godot::obj::Gd::<#exporter>::default();
 
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
-          .add_export_plugin(exporter.upcast());
+          .add_export_plugin(exporter.clone().upcast());
+
+          self.exporter = Some(exporter);
         }
 
         fn exit_tree(&mut self) {
-          let exporter = self.exporter.clone();
+          let exporter = self.exporter.clone().unwrap();
 
           <Self as ::godot::obj::WithBaseField>::base_mut(self)
           .remove_export_plugin(exporter.upcast());
+
+          self.exporter = None;
         }
       }
 
@@ -59,7 +63,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #[class(base=EditorExportPlugin, init, tool)]
       #marker struct #exporter {
         state: ::gd_props::private::ExporterState,
-        base: ::godot::obj::Base< ::godot::engine::EditorExportPlugin>
+        base: ::godot::obj::Base< ::godot::classes::EditorExportPlugin>
       }
 
       impl ::gd_props::traits::GdPropExporter for #exporter {
@@ -69,7 +73,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       }
 
       #[::godot::register::godot_api]
-      impl ::godot::engine::IEditorExportPlugin for #exporter {
+      impl ::godot::classes::IEditorExportPlugin for #exporter {
         fn export_begin(
           &mut self,
           features: ::godot::builtin::PackedStringArray,
@@ -94,7 +98,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
           type_: ::godot::builtin::GString,
           _features: ::godot::builtin::PackedStringArray
         ) {
-
+          // only `.gdron` files needs to be handled. `.gdbin` files are already exported correctly by built-in functionalities.
           if <Self as ::gd_props::traits::GdPropExporter>::_int_is_gdron(path.clone()) {
 
             let mut bytes: Option<::godot::builtin::PackedByteArray> = None;
@@ -107,19 +111,8 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
             )*
 
             if let Some(bytes) = bytes {
-              ::godot::log::godot_print!("Adding resource of {} type, from: {}; Remapped to: {}", &type_, &path, &changed_path);
+              ::godot::log::godot_print!("[{}]: .gdron -> .gdbin remap: {} type, from: {}; Remapped to: {}", stringify!(#exporter), &type_, &path, &changed_path);
               <Self as ::godot::obj::WithBaseField>::base_mut(self).add_file(changed_path, bytes, true);
-            }
-
-          } else if <Self as ::gd_props::traits::GdPropExporter>::_int_is_gdbin(path.clone()) {
-
-            let mut bytes: Option<::godot::builtin::PackedByteArray> = None;
-
-            bytes = <Self as ::gd_props::traits::GdPropExporter>::_int_read_file_to_bytes(path.clone());
-
-            if let Some(bytes) = bytes {
-              ::godot::log::godot_print!("Adding resource of {} type, from: {}", &type_, &path);
-              <Self as ::godot::obj::WithBaseField>::base_mut(self).add_file(path.clone(), bytes, false);
             }
           }
         }
@@ -130,7 +123,7 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #marker struct #loader;
 
       #[::godot::register::godot_api]
-      impl ::godot::engine::IResourceFormatLoader for #loader {
+      impl ::godot::classes::IResourceFormatLoader for #loader {
         fn get_recognized_extensions(&self) -> godot::builtin::PackedStringArray {
           <Self as ::gd_props::traits::GdPropLoader>::_int_get_recognized_extensions(self)
         }
@@ -196,13 +189,13 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
       #marker struct #saver;
 
       #[::godot::register::godot_api]
-      impl ::godot::engine::IResourceFormatSaver for #saver {
+      impl ::godot::classes::IResourceFormatSaver for #saver {
         fn save(
           &mut self,
-          resource: godot::obj::Gd<godot::engine::Resource>,
+          resource: godot::obj::Gd<godot::classes::Resource>,
           path: godot::builtin::GString,
           _flags: u32
-        ) -> godot::engine::global::Error {
+        ) -> godot::global::Error {
 
           let class = resource.get_class();
           #(
@@ -210,10 +203,10 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
               return <Self as ::gd_props::traits::GdPropSaver>::_int_save_to_file::<#registers>(self, resource.cast::<#registers>(), path);
             }
           )*
-          ::godot::engine::global::Error::ERR_UNAVAILABLE
+          ::godot::global::Error::ERR_UNAVAILABLE
         }
 
-        fn recognize(&self, resource: ::godot::obj::Gd<godot::engine::Resource>) -> bool {
+        fn recognize(&self, resource: ::godot::obj::Gd<godot::classes::Resource>) -> bool {
           let class = resource.get_class();
             #(
               if class.eq(&::godot::builtin::GString::from(stringify!(#registers))) {
@@ -225,12 +218,12 @@ pub fn gd_plugin_parser(decl: Declaration) -> Result<TokenStream, venial::Error>
 
         fn get_recognized_extensions(
           &self,
-          _resource: ::godot::obj::Gd<godot::engine::Resource>
+          _resource: ::godot::obj::Gd<godot::classes::Resource>
         ) -> godot::builtin::PackedStringArray {
           <Self as ::gd_props::traits::GdPropSaver>::_int_get_recognized_extensions(self)
         }
 
-        fn set_uid(&mut self, path: ::godot::builtin::GString, uid: i64) -> godot::engine::global::Error {
+        fn set_uid(&mut self, path: ::godot::builtin::GString, uid: i64) -> godot::global::Error {
           <Self as ::gd_props::traits::GdPropSaver>::_int_set_uid(self, path, uid)
         }
       }

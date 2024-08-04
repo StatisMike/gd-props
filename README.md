@@ -1,6 +1,5 @@
 # gd-props
-![Schedule tests](https://github.com/StatisMike/gd-props/actions/workflows/gdext_check.yaml/badge.svg)
-[![Latest compatible gdext](https://byob.yarr.is/StatisMike/gd-props/gdext_latest_success)](https://github.com/godot-rust/gdext)
+![Tests](https://github.com/StatisMike/gd-props/actions/workflows/tests.yaml/badge.svg)
 
 > Resources are akin to the versatile props that set the scene for an interactive masterpiece on the stage of game world. 
 > Much like actors skillfully employ props to enrich their storytelling, game objects leverage resources to craft a compelling virtual 
@@ -21,6 +20,9 @@ serialization and deserialization. Resources can be saved in two formats:
 
 
 ## Limitations
+
+> Currently `gd-props` supports only `Resource`s without the `Base<Resource>` field.
+
 If you include `gd-props` in your dependencies, you need use utilize [`godot`](https://github.com/godot-rust/gdext) crate with the feature
 `experimental-threads` enabled.
 

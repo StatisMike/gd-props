@@ -5,7 +5,7 @@ pub(crate) mod gdprop;
 pub(crate) mod gdprop_io;
 pub(crate) mod utils;
 
-/// Module containing serialization and deserialization modules for pointers to Godot [Resource](godot::engine::Resource)
+/// Module containing serialization and deserialization modules for pointers to Godot [Resource](godot::classes::Resource)
 /// and their collections.
 pub mod serde_gd;
 

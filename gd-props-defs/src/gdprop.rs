@@ -2,12 +2,12 @@ use std::io::{BufReader, BufWriter};
 
 use godot::builtin::meta::ToGodot;
 use godot::builtin::{GString, PackedByteArray, Variant};
-use godot::engine::file_access::ModeFlags;
-use godot::engine::global::Error;
-use godot::engine::utilities::randf;
-use godot::engine::{DirAccess, FileAccess, GFile, Resource, ResourceUid};
+use godot::classes::file_access::ModeFlags;
+use godot::classes::{DirAccess, FileAccess, Resource, ResourceUid};
+use godot::global::{randf, Error};
 use godot::log::godot_error;
 use godot::obj::{Gd, GodotClass, Inherits, UserClass};
+use godot::tools::GFile;
 use rmp_serde::Serializer;
 use serde::{Deserialize, Serialize};
 
@@ -15,7 +15,7 @@ use crate::gd_meta::GdMetaHeader;
 
 /// GdProp saveable resource
 ///
-/// Trait which provides methods to serialize and deserialize rust-defined [Resource](godot::engine::Resource) to:
+/// Trait which provides methods to serialize and deserialize rust-defined [Resource](godot::classes::Resource) to:
 /// - `.gdbin` files, based on [MessagePack](rmp_serde)
 /// - `.gdron` files, based on [ron]
 pub trait GdProp

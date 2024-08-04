@@ -1,8 +1,9 @@
-use godot::engine::{Engine, Object};
+use godot::classes::{Engine, Object};
 use godot::obj::bounds::MemRefCounted;
 use godot::obj::{Bounds, Gd, Inherits, UserClass};
 use godot::prelude::GodotClass;
 
+// Currently unused in tests as benchmarking was improved.
 pub(crate) trait GodotSingleton
 where
     Self: GodotClass + UserClass + Inherits<Object> + Bounds<Memory = MemRefCounted>,

@@ -3,7 +3,7 @@ use std::io::BufWriter;
 
 use gd_rehearse::itest::gditest;
 use godot::builtin::{Array, GString};
-use godot::engine::ResourceLoader;
+use godot::classes::ResourceLoader;
 use godot::obj::Gd;
 
 use ron::Serializer;
@@ -62,12 +62,12 @@ fn serde_bundled_array() {
 
     for i in 0..resource.array.len() {
         assert!(TestResource::check_set_eq(
-            resource.array.get(i).bind().get_set(),
-            deserialized.array.get(i).bind().get_set()
+            resource.array.get(i).unwrap().bind().get_set(),
+            deserialized.array.get(i).unwrap().bind().get_set()
         ));
         assert!(TestResource::check_vec_eq(
-            resource.array.get(i).bind().get_vec(),
-            deserialized.array.get(i).bind().get_vec()
+            resource.array.get(i).unwrap().bind().get_vec(),
+            deserialized.array.get(i).unwrap().bind().get_vec()
         ));
     }
 }

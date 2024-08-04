@@ -11,7 +11,7 @@
 //!
 //! The core functionality is based in three derive macros:
 //!
-//! - [GdProp] - used to implement [GdProp](crate::traits::GdProp) trait to the user-defined [Resource](godot::engine::Resource), making
+//! - [GdProp] - used to implement [GdProp](crate::traits::GdProp) trait to the user-defined [Resource](godot::classes::Resource), making
 //! it saveable and loadable to/from `.gdron` and `.gdbin` files.
 //! - [gd_props_plugin] - used to create all needed [GodotClass](godot::obj::GodotClass) structs to handle [GdProp]-annotated resources
 //! during saving/loading to and from custom formats and during project export.
